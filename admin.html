@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+// Навечно зашиваем проверку: если токен есть, скрипт молча пропускает дальше.
+// Команда document.write полностью удалена, чтобы не ломать DOM и не блокировать admin-script.js
+(function() {
+  var token = sessionStorage.getItem('adminToken');
+  if (!token) {
+    window.location.replace('login.html');
+  }
+})();
+</script>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MK Business Corp Admin</title>
+  <link rel="stylesheet" href="admin-styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="admin-container">
+    <header class="admin-header">
+      <a href="index.html" class="brand brand-link">
+        <img class="brand-logo-img" src="logos/10.png" alt="MK Business Logo" />
+        <span class="brand-name">MK Business Corp</span>
+      </a>
+      <div class="admin-controls">
+        <div class="language-dropdown">
+          <button class="lang-toggle" id="langToggle" data-en="Language" data-ru="Язык" data-uz="Til" data-kaa="Til">Language</button>
+          <div class="lang-menu" id="langMenu">
+            <button class="lang-option" data-lang="en">English</button>
+            <button class="lang-option" data-lang="ru">Русский</button>
+            <button class="lang-option" data-lang="uz">O'zbekcha</button>
+            <button class="lang-option" data-lang="kaa">Қарақалпақша</button>
+          </div>
+        </div>
+        <span id="adminUser" data-en="Welcome, Admin" data-ru="Добро пожаловать, Админ" data-uz="Xush kelibsiz, Admin" data-kaa="Qosh keldiniz, Admin">Welcome, Admin</span>
+        <button id="logoutBtn" class="logout-btn" data-en="Logout" data-ru="Выйти" data-uz="Chiqish" data-kaa="Shygyw">Logout</button>
+      </div>
+    </header>
+
+    <nav class="admin-nav">
+      <button class="nav-btn active" data-tab="contacts" data-en="Contacts" data-ru="Контакты" data-uz="Kontaktlar" data-kaa="Baylanıslar">Contacts</button>
+      <button class="nav-btn" data-tab="results" data-en="Results" data-ru="Результаты" data-uz="Natijalar" data-kaa="Nátiyjeler">Results</button>
+      <button class="nav-btn" data-tab="feedback" data-en="Feedback" data-ru="Отзывы" data-uz="Fikrlar" data-kaa="Pikirler">Feedback</button>
+      <button class="nav-btn" data-tab="templates" data-en="Templates" data-ru="Шаблоны" data-uz="Shablonlar" data-kaa="Úlgiler">Templates</button>
+      <button class="nav-btn" data-tab="learning" data-en="Courses" data-ru="Курсы" data-uz="Kurslar" data-kaa="Kurslar">Courses</button>
+      <button class="nav-btn" data-tab="users" data-en="Users" data-ru="Пользователи" data-uz="Foydalanuvchilar" data-kaa="Paydalanıwshılar">Users</button>
+      <button class="nav-btn" data-tab="sections" data-en="Sections" data-ru="Разделы" data-uz="Bo'limlar" data-kaa="Bólimler">Sections</button>
+    </nav>
+
+    <main class="admin-main">
+      <div id="contactsTab" class="tab-content active">
+        <div class="tab-header">
+          <h2 data-en="Contact Messages" data-ru="Сообщения" data-uz="Xabarlar" data-kaa="Baylanıs Xabarları">Contact Messages</h2>
+          <div class="tab-actions">
+            <button id="exportContacts" class="action-btn" data-en="Export CSV" data-ru="Экспорт CSV" data-uz="CSV eksport" data-kaa="CSV júklew">Export CSV</button>
+            <button id="refreshContacts" class="action-btn" data-en="Refresh" data-ru="Обновить" data-uz="Yangilash" data-kaa="Jańalaw">Refresh</button>
+          </div>
+        </div>
+
+        <div class="summary-grid" id="contactsSummary">
+          <div class="summary-card">
+            <span class="summary-label" data-en="Total Messages" data-ru="Всего Сообщений" data-uz="Jami Xabarlar" data-kaa="Jámi Habarlar">Total Messages</span>
+            <strong id="totalContacts">0</strong>
+          </div>
+          <div class="summary-card">
+            <span class="summary-label" data-en="Unique Senders" data-ru="Уникальные Отправители" data-uz="Noyob Yuboruvchilar" data-kaa="Unikal Jiberiwshiler">Unique Senders</span>
+            <strong id="uniqueSenders">0</strong>
+          </div>
+          <div class="summary-card">
+            <span class="summary-label" data-en="Last 7 Days" data-ru="Последние 7 Дней" data-uz="Oxirgi 7 Kun" data-kaa="Aqırǵı 7 Kún">Last 7 Days</span>
+            <strong id="recentContacts">0</strong>
+          </div>
+          <div class="summary-card">
+            <span class="summary-label" data-en="Latest Message" data-ru="Последнее Сообщение" data-uz="Oxirgi Xabar" data-kaa="Aqırǵı Habar">Latest Message</span>
+            <strong id="latestContact">—</strong>
+          </div>
+        </div>
+
+        <div class="controls-grid">
+          <div class="filter-group">
+            <label for="contactSearch" data-en="Search" data-ru="Поиск" data-uz="Qidirish" data-kaa="Izlew">Search</label>
+            <input id="contactSearch" type="text" placeholder="Search by name, email, or message" data-ru-placeholder="Поиск по имени, email или сообщению" data-uz-placeholder="Ism, email yoki xabar bo'yicha qidirish" data-kaa-placeholder="Atau, email yamasa habar boyınsha izlew" />
+          </div>
+          <div class="filter-group">
+            <label data-en="Date Range" data-ru="Период" data-uz="Sana oralig'i" data-kaa="Sana aralıǵı">Date Range</label>
+            <div class="date-row">
+              <input id="contactFromDate" type="date" />
+              <span data-en="to" data-ru="до" data-uz="gacha" data-kaa="shekem">to</span>
+              <input id="contactToDate" type="date" />
+            </div>
+          </div>
+          <div class="filter-group">
+            <label for="contactSort" data-en="Sort By" data-ru="Сортировка" data-uz="Saralash" data-kaa="Saralaw">Sort By</label>
+            <select id="contactSort">
+              <option value="date_desc" data-en="Newest First" data-ru="Сначала новые" data-uz="Avval yangi" data-kaa="Dáslepki jańa">Newest First</option>
+              <option value="date_asc" data-en="Oldest First" data-ru="Сначала старые" data-uz="Avval eski" data-kaa="Dáslepki eski">Oldest First</option>
+              <option value="name_asc" data-en="Name A-Z" data-ru="Имя А-Я" data-uz="Nom A-Z" data-kaa="At A-Z">Name A-Z</option>
+              <option value="name_desc" data-en="Name Z-A" data-ru="Имя Я-А" data-uz="Nom Z-A" data-kaa="At Z-A">Name Z-A</option>
+            </select>
+          </div>
+          <button id="clearContactFilters" class="soft-btn" data-en="Clear Filters" data-ru="Сбросить" data-uz="Tozalash" data-kaa="Tazalaw">Clear Filters</button>
+        </div>
+
+        <div id="contactsList" class="list-stack"></div>
+      </div>
+
+      <div id="resultsTab" class="tab-content">
+        <div class="tab-header">
+          <h2 data-en="Results & Achievements" data-ru="Результаты" data-uz="Natijalar" data-kaa="Netijeler">Results & Achievements</h2>
+          <div class="tab-actions">
+            <button id="refreshResults" class="action-btn" data-en="Refresh" data-ru="Обновить" data-uz="Yangilash" data-kaa="Jańalaw">Refresh</button>
+            <button id="addItemBtn" class="action-btn" data-en="Add Item" data-ru="Добавить" data-uz="Qo'shish" data-kaa="Qosıw">Add Item</button>
+          </div>
+        </div>
+        <div id="resultsSummary" class="summary-grid"></div>
+        <div id="resultsList" class="list-stack"></div>
+      </div>
+
+      <div id="feedbackTab" class="tab-content">
+        <div class="tab-header">
+          <h2 data-en="Client Feedback" data-ru="Отзывы клиентов" data-uz="Mijoz fikrlari" data-kaa="Klient pikiri">Client Feedback</h2>
+          <div class="tab-actions">
+            <button id="refreshFeedback" class="action-btn" data-en="Refresh" data-ru="Обновить" data-uz="Yangilash" data-kaa="Jańalaw">Refresh</button>
+            <button id="addFeedbackBtn" class="action-btn" data-en="Add Feedback" data-ru="Добавить отзыв" data-uz="Fikr qo'shish" data-kaa="Pikir qosıw">Add Feedback</button>
+          </div>
+        </div>
+        <div id="feedbackSummary" class="summary-grid"></div>
+        <div id="feedbackList" class="list-stack"></div>
+      </div>
+
+      <div id="learningTab" class="tab-content">
+        <div class="tab-header">
+          <h2 data-en="Courses & Webinars" data-ru="Курсы и вебинары" data-uz="Kurslar va vebinarlar" data-kaa="Kurslar hám vebinarlar">Courses & Webinars</h2>
+          <div class="tab-actions">
+            <button id="refreshLearning" class="action-btn" data-en="Refresh" data-ru="Обновить" data-uz="Yangilash" data-kaa="Jańalaw">Refresh</button>
+            <button id="addLearningBtn" class="action-btn" data-en="Add Program" data-ru="Добавить программу" data-uz="Dastur qo'shish" data-kaa="Programma qosıw">Add Program</button>
+          </div>
+        </div>
+        <div id="learningSummary" class="summary-grid"></div>
+        <div id="learningList" class="list-stack"></div>
+      </div>
+
+      <div id="templatesTab" class="tab-content">
+        <div class="tab-header">
+          <h2 data-en="Templates & Materials" data-ru="Шаблоны и материалы" data-uz="Shablonlar va materiallar" data-kaa="Úlgiler hám materiallar">Templates & Materials</h2>
+          <div class="tab-actions">
+            <button id="refreshTemplates" class="action-btn" data-en="Refresh" data-ru="Обновить" data-uz="Yangilash" data-kaa="Jańalaw">Refresh</button>
+            <button id="addTemplateBtn" class="action-btn" data-en="Add Template" data-ru="Добавить шаблон" data-uz="Shablon qo'shish" data-kaa="Úlgi qosıw">Add Template</button>
+          </div>
+        </div>
+        <div id="templatesSummary" class="summary-grid"></div>
+        <div id="templatesList" class="list-stack"></div>
+      </div>
+
+      <div id="usersTab" class="tab-content">
+        <div class="tab-header">
+          <h2 data-en="Site Users" data-ru="Пользователи сайта" data-uz="Sayt foydalanuvchilari" data-kaa="Sayt paydalanıwshıları">Site Users</h2>
+          <button id="refreshUsers" class="action-btn" data-en="Refresh" data-ru="Обновить" data-uz="Yangilash" data-kaa="Jańalaw">Refresh</button>
+        </div>
+        <div id="usersList" class="list-stack"></div>
+      </div>
+
+      <div id="sectionsTab" class="tab-content">
+        <div class="tab-header">
+          <h2 data-en="Site Sections" data-ru="Разделы сайта" data-uz="Sayt bo'limlari" data-kaa="Sayt bólimleri">Site Sections</h2>
+        </div>
+        <div class="section-intro-text" style="color:#666;font-size:0.9rem;margin-bottom:1.5rem;" data-en="Manage the visibility of sections on the main page. Changes take effect immediately." data-ru="Управляйте видимостью разделов на главной странице. Изменения вступают в силу сразу." data-uz="Asosiy sahifadagi bo‘limlar ko‘rinishini boshqaring. O‘zgarishlar darhol kuchga kiradi.">
+          Manage the visibility of sections on the main page. Changes take effect immediately.
+        </div>
+        <div id="sectionsList" style="display:grid;gap:1rem;max-width:600px;">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Модальные окна сохранения данных -->
+  <div id="addResultModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 data-en="Add New Item" data-ru="Добавить запись" data-uz="Yangi yozuv qo'shish" data-kaa="Jańa jazıw qosıw">Add New Item</h3>
+        <span class="close-modal">&times;</span>
+      </div>
+      <form id="addResultForm" class="result-form">
+        <div class="form-group">
+          <label for="itemType" data-en="Type" data-ru="Тип" data-uz="Turi" data-kaa="Turi">Type</label>
+          <select id="itemType">
+            <option value="result" data-en="Result" data-ru="Результат" data-uz="Natija" data-kaa="Netije">Result</option>
+            <option value="achievement" data-en="Achievement" data-ru="Достижение" data-uz="Erish" data-kaa="Jetistik">Achievement</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="resultTitle" data-en="Title" data-ru="Название" data-uz="Sarlavha" data-kaa="Atauı">Title</label>
+          <input type="text" id="resultTitle" required />
+        </div>
+        <div class="form-group">
+          <label for="resultValue" data-en="Value" data-ru="Значение" data-uz="Qiymat" data-kaa="Qıymaty">Value</label>
+          <input type="text" id="resultValue" required />
+        </div>
+        <div class="form-group">
+          <label for="resultDescription" data-en="Description" data-ru="Описание" data-uz="Tavsif" data-kaa="Sipattama">Description</label>
+          <textarea id="resultDescription" rows="3"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="soft-btn cancel-btn" data-en="Cancel" data-ru="Отмена" data-uz="Bekor qilish" data-kaa="Biykarlaw">Cancel</button>
+          <button type="submit" class="action-btn save-btn" data-en="Save Item" data-ru="Сохранить Элемент" data-uz="Elementni Saqlash" data-kaa="Elementti Saqlaw">Save Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="addFeedbackModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 data-en="Add Feedback" data-ru="Добавить отзыв" data-uz="Fikr qo'shish" data-kaa="Pikir qosıw">Add Feedback</h3>
+        <span class="close-modal">&times;</span>
+      </div>
+      <form id="addFeedbackForm" class="result-form">
+        <div class="form-group">
+          <label for="feedbackName" data-en="Name" data-ru="Имя" data-uz="Ism" data-kaa="At">Name</label>
+          <input type="text" id="feedbackName" required />
+        </div>
+        <div class="form-group">
+          <label for="feedbackRole" data-en="Role" data-ru="Роль" data-uz="Lavozim" data-kaa="Rol">Role</label>
+          <input type="text" id="feedbackRole" required />
+        </div>
+        <div class="form-group">
+          <label for="feedbackOrg" data-en="Organization" data-ru="Организация" data-uz="Tashkilot" data-kaa="Uyım">Organization</label>
+          <input type="text" id="feedbackOrg" required />
+        </div>
+        <div class="form-group">
+          <label for="feedbackMessage" data-en="Message" data-ru="Сообщение" data-uz="Xabar" data-kaa="Habar">Message</label>
+          <textarea id="feedbackMessage" rows="4" required></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="soft-btn cancel-btn" data-en="Cancel" data-ru="Отмена" data-uz="Bekor qilish" data-kaa="Biykarlaw">Cancel</button>
+          <button type="submit" class="action-btn save-btn" data-en="Save Feedback" data-ru="Сохранить Отзыв" data-uz="Sharhni Saqlash" data-kaa="Pikirni Saqlaw">Save Feedback</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="addLearningModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 data-en="Add Learning Program" data-ru="Добавить Программу" data-uz="Dastur Qo'shish" data-kaa="Programma Qosıw">Add Learning Program</h3>
+        <span class="close-modal">&times;</span>
+      </div>
+      <form id="addLearningForm" class="result-form">
+        <div class="form-group">
+          <label for="learningTitle" data-en="Title" data-ru="Название" data-uz="Sarlavha" data-kaa="Atauı">Title</label>
+          <input type="text" id="learningTitle" required />
+        </div>
+        <div class="form-group">
+          <label for="learningFormat" data-en="Format" data-ru="Формат" data-uz="Format" data-kaa="Formatı">Format</label>
+          <select id="learningFormat">
+            <option value="course" data-en="Course" data-ru="Курс" data-uz="Kurs" data-kaa="Kurs">Course</option>
+            <option value="webinar" data-en="Webinar" data-ru="Вебинар" data-uz="Vebinar" data-kaa="Vebinar">Webinar</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="learningDate" data-en="Date" data-ru="Дата" data-uz="Sana" data-kaa="Kún">Date</label>
+          <input type="text" id="learningDate" placeholder="April 2026" required />
+        </div>
+        <div class="form-group">
+          <label for="learningDescription" data-en="Description" data-ru="Описание" data-uz="Tavsif" data-kaa="Sipattama">Description</label>
+          <textarea id="learningDescription" rows="4"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="soft-btn cancel-btn" data-en="Cancel" data-ru="Отмена" data-uz="Bekor qilish" data-kaa="Biykarlaw">Cancel</button>
+          <button type="submit" class="action-btn save-btn" data-en="Save Program" data-ru="Сохранить Программу" data-uz="Dastur Saqlash" data-kaa="Programmanı Saqlaw">Save Program</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="addTemplateModal" class="modal">
+    <div class="modal-content" style="max-width:680px">
+      <div class="modal-header">
+        <h3 data-en="Add Template" data-ru="Добавить шаблон" data-uz="Shablon qo'shish" data-kaa="Úlgi qosıw">Add Template</h3>
+        <span class="close-modal">&times;</span>
+      </div>
+      <form id="addTemplateForm" class="result-form">
+        <p style="font-size:0.8rem;color:#64748b;margin-bottom:1rem;background:#f8fafc;padding:0.75rem;border-radius:8px">
+          📋 <strong>Title (UZ)</strong> — основное название на узбекском (обязательно). Остальные языки необязательны.
+        </p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+          <div class="form-group">
+            <label>Название (UZ) *</label>
+            <input type="text" id="templateTitle" required placeholder="Узбекча номи" />
+          </div>
+          <div class="form-group">
+            <label>Название (RU)</label>
+            <input type="text" id="templateTitleRu" placeholder="Русское название" />
+          </div>
+          <div class="form-group">
+            <label>Title (EN)</label>
+            <input type="text" id="templateTitleEn" placeholder="English title" />
+          </div>
+          <div class="form-group">
+            <label>Atauı (KAA)</label>
+            <input type="text" id="templateTitleKaa" placeholder="Qaraqalpaqsha atauı" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Описание (RU)</label>
+          <textarea id="templateDescription" rows="2" placeholder="Краткое описание на русском"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Description (EN)</label>
+          <textarea id="templateDescriptionEn" rows="2" placeholder="Short description in English"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem">
+          <div class="form-group">
+            <label>Категория</label>
+            <select id="templateType">
+              <option value="business">Бизнес-план</option>
+              <option value="grant">Грант</option>
+              <option value="hr">HR</option>
+              <option value="finance">Финансы</option>
+              <option value="legal">Юридический</option>
+              <option value="other">Другое</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Badge</label>
+            <select id="templateBadge">
+              <option value="DOC">DOC</option>
+              <option value="DOCX">DOCX</option>
+              <option value="PDF">PDF</option>
+              <option value="XLSX">XLSX</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Порядок (сортировка)</label>
+            <input type="number" id="templatePages" value="0" min="0" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>URL изображения (превью)</label>
+          <input type="url" id="templateImage" placeholder="https://images.unsplash.com/..." />
+        </div>
+        <div class="form-group">
+          <label>📎 Загрузить файл (.doc, .docx, .pdf)</label>
+          <input type="file" id="templateUpload" accept=".doc,.docx,.pdf,.xlsx,.xls" style="padding:0.5rem" />
+          <small id="templateFileStatus" style="color:#64748b;font-size:0.8rem"></small>
+        </div>
+        <div class="form-group" style="display:flex;align-items:center;gap:0.75rem">
+          <input type="checkbox" id="templatePublished" checked style="width:18px;height:18px;cursor:pointer" />
+          <label for="templatePublished" style="margin:0;cursor:pointer">Опубликован (виден на сайте)</label>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="soft-btn cancel-btn">Отмена</button>
+          <button type="submit" class="action-btn save-btn">Сохранить шаблон</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="admin-script.js"></script>
+</body>
+</html>

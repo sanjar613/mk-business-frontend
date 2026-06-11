@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com blob:; connect-src 'self' http://localhost:8080 http://127.0.0.1:8080 https://api.mkbusiness.uz;" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="MK Business — Шаблоны бизнес-документов: бизнес-планы, грантовые заявки, HR-документы для предпринимателей Каракалпакстана." />
+  <title>MK Business — Шаблоны и материалы</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .brand-logo-img { height: 36px; width: auto; display: block; object-fit: contain; }
+    .brand-mark { display: none; }
+    .brand { gap: 0.5rem; }
+    .footer-brand .brand-mark { display: none; }
+    .footer-logo-img { height: 36px; width: auto; filter: brightness(0) invert(1); opacity: 0.9; }
+    .site-header.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.1); }
+
+    /* ── Templates Page Hero ── */
+    .templates-hero {
+      padding: 7rem 2rem 4rem;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #1a3a5c 100%);
+      text-align: center;
+      color: white;
+    }
+    .templates-hero .eyebrow {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent, #e8a020);
+      margin-bottom: 1rem;
+      background: rgba(255,255,255,0.08);
+      padding: 0.35rem 1rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .templates-hero h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      color: white;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+    .templates-hero p {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.75);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── Filter Bar ── */
+    .templates-filter {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 2rem 2rem 0;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .filter-btn {
+      padding: 0.5rem 1.2rem;
+      border-radius: 20px;
+      border: 1.5px solid var(--border-soft, #e2e8f0);
+      background: white;
+      color: var(--text-secondary, #475569);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--accent, #1e40af);
+      color: white;
+      border-color: var(--accent, #1e40af);
+    }
+
+    /* ── Grid ── */
+    .templates-page-section {
+      padding: 2.5rem 2rem 5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .templates-page-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    /* ── Loading / Empty ── */
+    .templates-loading, .templates-empty {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-secondary, #64748b);
+      grid-column: 1 / -1;
+    }
+    .templates-loading .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #1e40af;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Template Card ── */
+    .tpl-card {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid #e8edf3;
+      overflow: hidden;
+      transition: box-shadow 0.25s, transform 0.25s;
+      display: flex;
+      flex-direction: column;
+    }
+    .tpl-card:hover {
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+      transform: translateY(-3px);
+    }
+    .tpl-card-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      background: #f1f5f9;
+    }
+    .tpl-card-img-placeholder {
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(135deg, #e8f0fe, #dbeafe);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+    .tpl-card-preview {
+      position: relative;
+    }
+    .tpl-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: #1e40af;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+    }
+    .tpl-card-body {
+      padding: 1.25rem 1.25rem 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .tpl-card-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+      line-height: 1.35;
+    }
+    .tpl-card-desc {
+      font-size: 0.85rem;
+      color: #64748b;
+      line-height: 1.6;
+      flex: 1;
+      margin-bottom: 1rem;
+    }
+    .tpl-download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.2rem;
+      background: #1e40af;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+      font-family: inherit;
+      width: 100%;
+      justify-content: center;
+    }
+    .tpl-download-btn:hover { background: #1d3a9e; }
+    .tpl-download-btn.no-file {
+      background: #475569;
+      cursor: pointer;
+    }
+    .tpl-download-btn.no-file:hover { background: #334155; }
+    .tpl-download-btn svg { flex-shrink: 0; }
+
+    /* Contact strip */
+    .templates-cta {
+      background: linear-gradient(135deg, #1e3a5f, #1a3a5c);
+      padding: 4rem 2rem;
+      text-align: center;
+      color: white;
+    }
+    .templates-cta h2 { font-size: 1.7rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .templates-cta p { color: rgba(255,255,255,0.75); margin-bottom: 1.75rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+
+    /* ── Grant info section ── */
+    .grant-info-section {
+      max-width: 1100px;
+      margin: 2.5rem auto 0;
+      padding: 0 2rem;
+    }
+    .grant-info-card {
+      background: linear-gradient(135deg, #f0f7ff, #e8f4ff);
+      border: 1px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 2rem 2.5rem;
+    }
+    .grant-info-card h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #1e3a5f;
+      margin-bottom: 1rem;
+    }
+    .grant-info-card p {
+      font-size: 0.93rem;
+      color: #374151;
+      line-height: 1.75;
+      margin-bottom: 0.85rem;
+    }
+    .grant-info-card p:last-of-type { margin-bottom: 0; }
+    .grant-info-card ul {
+      margin: 0.5rem 0 0.85rem 1.2rem;
+      font-size: 0.93rem;
+      color: #374151;
+      line-height: 1.75;
+    }
+    .grant-info-card ul li { margin-bottom: 0.25rem; }
+    .grant-stats {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid #bfdbfe;
+    }
+    .grant-stat {
+      flex: 1;
+      min-width: 160px;
+      background: white;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      text-align: center;
+    }
+    .grant-stat-num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #1e40af;
+      display: block;
+    }
+    .grant-stat-label {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-top: 0.25rem;
+      line-height: 1.4;
+    }
+    @media(max-width:640px){
+      .grant-info-card { padding: 1.5rem; }
+      .grant-info-section { padding: 0 1.25rem; }
+    }
+    @media (max-width: 640px) {
+      .templates-hero { padding: 6rem 1.25rem 3rem; }
+      .templates-page-section { padding: 1.5rem 1.25rem 3rem; }
+      .templates-filter { padding: 1.5rem 1.25rem 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen"></div>
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <header class="site-header">
+    <a href="index.html" class="brand brand-link">
+      <img class="brand-logo-img" src="logos/10.png" alt="MK Business Logo" />
+    </a>
+    <nav class="site-nav">
+      <a href="index.html#services" class="nav-link" data-en="Services" data-ru="Услуги" data-uz="Xizmatlar" data-kaa="Qizmetler">Services</a>
+      <a href="index.html#about" class="nav-link" data-en="About" data-ru="О нас" data-uz="Biz haqimizda" data-kaa="Biz haqqında">About</a>
+      <a href="articles.html" class="nav-link" data-en="Articles" data-ru="Статьи" data-uz="Maqolalar" data-kaa="Maqalalar">Articles</a>
+      <a href="templates.html" class="nav-link active" data-en="Templates" data-ru="Шаблоны" data-uz="Shablonlar" data-kaa="Úlgiler">Шаблоны</a>
+      <a href="index.html#contact" class="nav-link" data-en="Contact" data-ru="Контакты" data-uz="Bog'lanish" data-kaa="Baylanis Ushin">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <div class="language-dropdown">
+        <button id="langToggle" class="lang-toggle">Language</button>
+        <div id="langMenu" class="lang-menu">
+          <button class="lang-option" data-lang="en">English</button>
+          <button class="lang-option" data-lang="ru">Русский</button>
+          <button class="lang-option" data-lang="uz">O'zbekcha</button>
+          <button class="lang-option" data-lang="kaa">Qaraqalpaqsha</button>
+        </div>
+      </div>
+    </div>
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu" onclick="toggleMobileMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="templates-hero">
+      <div class="eyebrow" data-en="Free Business Templates" data-ru="Бесплатные шаблоны" data-uz="Bepul shablonlar" data-kaa="Tegin úlgiler">Бесплатные шаблоны</div>
+      <h1 data-en="Templates &amp; Useful Materials" data-ru="Шаблоны и полезные материалы" data-uz="Shablonlar va foydali materiallar" data-kaa="Úlgiler hám paydali materiallar">Шаблоны и полезные материалы</h1>
+      <p data-en="Download ready-made business plan templates, grant applications, HR documents and other useful materials for entrepreneurs and organizations in Karakalpakstan."
+         data-ru="Скачайте готовые шаблоны бизнес-планов, грантовых заявок, HR-документы и другие полезные материалы для предпринимателей и организаций Каракалпакстана."
+         data-uz="Karakalpakstan tadbirkorlari va tashkilotlari uchun biznes-rejalar, grant arizalari, HR-hujjatlar va boshqa foydali materiallarni yuklab oling."
+         data-kaa="Qaraqalpaqstan iskerlerine hám tashkilatlarına arnalǵan biznes-rejalar, grant arizaları, HR hújjetler hám basqa paydali materiallardı júklep alıń.">
+        Скачайте готовые шаблоны бизнес-планов, грантовых заявок, HR-документы и другие полезные материалы для предпринимателей и организаций Каракалпакстана.
+      </p>
+    </section>
+
+    <!-- Filter -->
+    <div class="templates-filter" id="filterBar">
+      <button class="filter-btn active" data-cat="all" data-en="All" data-ru="Все" data-uz="Barchasi" data-kaa="Barlıǵı">All</button>
+      <button class="filter-btn" data-cat="business" data-en="Business Plans" data-ru="Бизнес-планы" data-uz="Biznes-rejalar" data-kaa="Biznes-jobalar">Бизнес-планы</button>
+      <button class="filter-btn" data-cat="grant" data-en="Grants" data-ru="Гранты" data-uz="Grantlar" data-kaa="Grant programmalar">Гранты</button>
+      <button class="filter-btn" data-cat="hr" data-en="HR Documents" data-ru="HR-документы" data-uz="HR hujjatlari" data-kaa="HR hújjetleri">HR-документы</button>
+      <button class="filter-btn" data-cat="finance" data-en="Finance" data-ru="Финансы" data-uz="Moliya" data-kaa="Maliye">Финансы</button>
+      <button class="filter-btn" data-cat="other" data-en="Other" data-ru="Другое" data-uz="Boshqalar" data-kaa="Basqası">Другое</button>
+    </div>
+
+
+    <!-- Grant Info Section -->
+    <div class="grant-info-section" id="grantInfoBlock">
+      <div class="grant-info-card">
+        <h2 data-en="Grant Application Templates" data-ru="Шаблоны грантовых заявок" data-uz="Grant arizalari shablonlari" data-kaa="Grant arizaları shablonları">Шаблоны грантовых заявок</h2>
+        <p data-ru="В данном разделе представлены примерные шаблоны и структуры грантовых заявок, подготовленные на основе требований международных организаций, фондов и программ развития. Материалы предназначены для ознакомления и могут помочь в понимании базовых принципов подготовки грантовых проектов."
+           data-en="This section contains sample templates and grant application structures prepared based on the requirements of international organizations, foundations and development programs."
+           data-uz="Ushbu bo'limda xalqaro tashkilotlar, fondlar va rivojlanish dasturlari talablariga asoslanib tayyorlangan namunali shablonlar va grant arizalari tuzilmalari keltirilgan."
+           data-kaa="Bul bólimde xalıqaralıq tashkilotlar, qorlar hám rawajlanıw programmaları talablarına tiykarlap tayarlanǵan úlgileri hám grant arizaları strukturaları berilgen.">
+          В данном разделе представлены примерные шаблоны и структуры грантовых заявок, подготовленные на основе требований международных организаций, фондов и программ развития. Материалы предназначены для ознакомления и могут помочь в понимании базовых принципов подготовки грантовых проектов.
+        </p>
+        <p data-ru="Следует учитывать, что каждый грантодатель использует собственные формы заявок, критерии оценки и требования к проектам. Именно поэтому перед подготовкой заявки рекомендуется внимательно изучить официальный сайт программы, руководство для заявителей, приоритетные направления финансирования и требования к проектной документации."
+           data-en="Each grantor uses their own application forms, evaluation criteria, and project requirements. We recommend carefully studying the program's official website, applicant guidelines, and funding priorities before preparing your application."
+           data-uz="Har bir grantchi o'zining ariza shakllari, baholash mezonlari va loyiha talablaridan foydalanadi. Ariza tayyorlashdan oldin dasturning rasmiy saytini, ariza beruvchilar uchun qo'llanmani va moliyalashtirish ustuvorliklarini diqqat bilan o'rganishni tavsiya etamiz."
+           data-kaa="Hár bir grantshi óz ariza formalları, bahalaw kriteryaları hám loyiha talablarınan paydalanıwı múmkin. Ariza tayarlaw aldında programmanıń rasmiy saytın, ariza beriwshiler ushın qollanbanı hám finanslandırıw ustuvorlıqların dıqqat penen úyreniw usınıs etiledi.">
+          Следует учитывать, что каждый грантодатель использует собственные формы заявок, критерии оценки и требования к проектам. Именно поэтому перед подготовкой заявки рекомендуется внимательно изучить официальный сайт программы, руководство для заявителей, приоритетные направления финансирования и требования к проектной документации.
+        </p>
+        <p data-ru="Несмотря на различия между программами, большинство грантовых заявок обычно включают:"
+           data-en="Despite differences between programs, most grant applications typically include:"
+           data-uz="Dasturlar o'rtasidagi farqlarga qaramay, ko'pchilik grant arizalari odatda quyidagilarni o'z ichiga oladi:"
+           data-kaa="Programmalardıń arasındaǵı parıqlárǵa qaramastan, kópshilik grant arizaları ádette tómendegilerdi óz ishine alıwı múmkin:">
+          Несмотря на различия между программами, большинство грантовых заявок обычно включают:
+        </p>
+        <ul>
+          <li data-ru="описание проблемы, цели и задачи проекта" data-en="problem description, project goals and objectives" data-uz="muammo tavsifi, loyiha maqsad va vazifalari" data-kaa="másele súwretlemesi, loyiha maqset hám waziypaları">описание проблемы, цели и задачи проекта</li>
+          <li data-ru="ожидаемые результаты и план мероприятий" data-en="expected results and action plan" data-uz="kutilayotgan natijalar va tadbirlar rejasi" data-kaa="kútilinip atırǵan nátiyjeler hám ilajlar rejesi">ожидаемые результаты и план мероприятий</li>
+          <li data-ru="бюджет и показатели эффективности" data-en="budget and performance indicators" data-uz="byudjet va samaradorlik ko'rsatkichlari" data-kaa="byudjet hám nátiyjelilik kórsetkishleri">бюджет и показатели эффективности</li>
+          <li data-ru="информацию об устойчивости проекта после завершения финансирования" data-en="project sustainability information after funding ends" data-uz="moliyalashtirish tugagandan keyin loyiha barqarorligi haqida ma'lumot" data-kaa="finanslandırıw ayaqlanǵannan keyingi loyiha turaqlılıǵı haqqında maǵlıwmat">информацию об устойчивости проекта после завершения финансирования</li>
+        </ul>
+        <p data-ru="Во многих международных программах первоначально требуется направить краткую Concept Note (концепцию проекта). Именно поэтому рекомендуется начинать работу над проектом с подготовки качественной Concept Note, которая позволяет структурировать идею проекта, определить соответствие требованиям программы и повысить вероятность прохождения первого этапа отбора. В данном разделе также размещены примерные шаблоны Concept Note."
+           data-en="Many international programs initially require a brief Concept Note. We recommend starting with a quality Concept Note, which helps structure your project idea, assess program alignment, and improve your chances at the first selection stage. Sample Concept Note templates are also available in this section."
+           data-uz="Ko'plab xalqaro dasturlarda dastlab qisqacha Concept Note (loyiha kontseptsiyasi) taqdim etish talab qilinadi. Loyiha ustida ishlashni sifatli Concept Note tayyorlashdan boshlashni tavsiya etamiz."
+           data-kaa="Kóplegen xalıqaralıq programmalarda dáslepki bolıp qısqasha Concept Note (loyiha konceptsiyası) taqdim etiw talap etiledi. Loyiha ústinde islesti sapali Concept Note tayarlawdan baslaw usınıs etiledi.">
+          Во многих международных программах первоначально требуется направить краткую Concept Note (концепцию проекта). Именно поэтому рекомендуется начинать работу над проектом с подготовки качественной Concept Note, которая позволяет структурировать идею проекта, определить соответствие требованиям программы и повысить вероятность прохождения первого этапа отбора. В данном разделе также размещены примерные шаблоны Concept Note.
+        </p>
+        <p data-ru="MK Business Corp оказывает консультационные услуги по: поиску грантовых возможностей, анализу требований грантодателей, подготовке Concept Note, разработке грантовых заявок, составлению бюджета проектов, сопровождению грантовых инициатив для бизнеса, ННО, образовательных и исследовательских учреждений."
+           data-en="MK Business Corp provides consulting services in: finding grant opportunities, analyzing grantor requirements, preparing Concept Notes, developing grant applications, drafting project budgets, and supporting grant initiatives for businesses, NGOs, educational and research institutions."
+           data-uz="MK Business Corp quyidagi yo'nalishlarda konsultatsiya xizmatlarini ko'rsatadi: grant imkoniyatlarini qidirish, grant beruvchilar talablarini tahlil qilish, Concept Note tayyorlash, grant arizalarini ishlab chiqish, loyiha byudjetini tuzish."
+           data-kaa="MK Business Corp tómendegi baǵdarlar boyınsha konsultatsiya qızmetlerin kórsetedi: grant múmkinshiliklerdi izlew, grant beriwshiler talabların talqılaw, Concept Note tayarlaw, grant arizaların islep shıǵıw, loyiha byudjetin dúziw.">
+          MK Business Corp оказывает консультационные услуги по: поиску грантовых возможностей, анализу требований грантодателей, подготовке Concept Note, разработке грантовых заявок, составлению бюджета проектов, сопровождению грантовых инициатив для бизнеса, ННО, образовательных и исследовательских учреждений.
+        </p>
+        <div class="grant-stats">
+          <div class="grant-stat">
+            <span class="grant-stat-num">1 млрд+</span>
+            <div class="grant-stat-label" data-ru="сумов привлечено в 2025 году" data-en="UZS attracted in grants, 2025" data-uz="2025 yilda jalb etilgan mablag'" data-kaa="2025 jılı jalb etilgen grant">сумов привлечено в 2025 году</div>
+          </div>
+          <div class="grant-stat">
+            <span class="grant-stat-num">300 млн+</span>
+            <div class="grant-stat-label" data-ru="сумов за первые 3 месяца 2026 г." data-en="UZS in first 3 months of 2026" data-uz="2026 yilning birinchi 3 oyida" data-kaa="2026 jılıniń dáslepki 3 ayında">сумов за первые 3 месяца 2026 г.</div>
+          </div>
+          <div class="grant-stat">
+            <span class="grant-stat-num">5+</span>
+            <div class="grant-stat-label" data-ru="сфер: предпринимательство, образование, экология и др." data-en="sectors: business, education, ecology & more" data-uz="soha: tadbirkorlik, ta'lim, ekologiya va boshqalar" data-kaa="sfera: iskerlik, bilimlendiriw, ekologiya hám basqalar">сфер: предпринимательство, образование, экология и др.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <section class="templates-page-section">
+      <div class="templates-page-grid" id="templatesPageGrid">
+        <div class="templates-loading">
+          <div class="spinner"></div>
+          <p data-en="Loading templates..." data-ru="Загрузка шаблонов..." data-uz="Shablonlar yuklanmoqda..." data-kaa="Úlgiler júkleniwde...">Loading templates...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="templates-cta">
+      <h2 data-en="Need a custom template?" data-ru="Нужен индивидуальный шаблон?" data-uz="Maxsus shablon kerakmi?" data-kaa="Arnawlı úlgi kerek pe?">Нужен индивидуальный шаблон?</h2>
+      <p data-en="We can develop customized documents tailored to your specific business needs." data-ru="Мы можем разработать индивидуальные документы под ваш конкретный бизнес-запрос." data-uz="Sizning maxsus biznes ehtiyojlaringizga moslashtirilgan hujjatlarni ishlab chiqishimiz mumkin." data-kaa="Sizdiń arnawlı biznes talablarıńızǵa moslastırılǵan hújjetlerdi islep shıǵamız.">
+        Мы можем разработать индивидуальные документы под ваш конкретный бизнес-запрос.
+      </p>
+      <a href="index.html#contact" class="button button-primary" data-en="Contact Us" data-ru="Связаться с нами" data-uz="Biz bilan bog'laning" data-kaa="Biz benen baylanısıń">Связаться с нами</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="index.html" class="brand brand-link">
+          <img class="footer-logo-img" src="logos/10.png" alt="MK Business" />
+        </a>
+        <p data-en="Consulting, analytics and business development support in Karakalpakstan."
+           data-ru="Консалтинг, аналитика и поддержка развития бизнеса в Каракалпакстане."
+           data-uz="Qoraqalpog'istonda konsalting, tahlil va biznesni rivojlantirishga ko'mak."
+           data-kaa="Qaraqalpaqstanda konsalting, talqılawlar hám biznes rawajlanıwın qollaw.">
+          Консалтинг, аналитика и поддержка развития бизнеса в Каракалпакстане.
+        </p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4 data-en="Navigation" data-ru="Навигация" data-uz="Navigatsiya" data-kaa="Navigaciya">Навигация</h4>
+          <a href="index.html" data-en="Home" data-ru="Главная" data-uz="Bosh sahifa" data-kaa="Bas bet">Главная</a>
+          <a href="articles.html" data-en="Articles" data-ru="Статьи" data-uz="Maqolalar" data-kaa="Maqalalar">Статьи</a>
+          <a href="templates.html" data-en="Templates" data-ru="Шаблоны" data-uz="Shablonlar" data-kaa="Úlgiler">Шаблоны</a>
+          <a href="index.html#contact" data-en="Contact" data-ru="Контакты" data-uz="Bog'lanish" data-kaa="Baylanıs">Контакты</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 MK Business Corp. <span data-en="All rights reserved." data-ru="Все права защищены." data-uz="Barcha huquqlar himoyalangan." data-kaa="Barlıq huqıqlar qorǵalǵan.">Все права защищены.</span></p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+
+    // ── Category icons ──
+    const CAT_ICONS = {
+      business: '📊', grant: '🏆', hr: '👥', finance: '💰', legal: '📋', other: '📄'
+    };
+
+    // ── Default templates (fallback if backend unavailable) ──
+    const DEFAULT_TEMPLATES = [
+      { id: 1,
+        title: { uz: 'Тикув цехини ташкиллаштириш', ru: 'Швейный цех: организация производства', en: 'Sewing Workshop Business Plan', kaa: 'Tikiw cexin shólkemlestiríw' },
+        description: { uz: 'Тикув цехи бизнесини ташкиллаштириш учун тайёр бизнес-режа шаблони.', ru: 'Готовый шаблон бизнес-плана для организации швейного цеха.', en: 'Ready business plan template for organizing a sewing workshop.', kaa: 'Tikiw cexin shólkemlestiríw ushın tayın biznes-joba shablonı.' },
+        category: 'business', badge: 'DOC', imageUrl: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=600&q=80&auto=format&fit=crop', hasFile: false },
+      { id: 2,
+        title: { uz: 'Хусусий болалар богчаси', ru: 'Частный детский сад', en: 'Private Kindergarten Business Plan', kaa: 'Jeke bala baqsha' },
+        description: { uz: 'Хусусий болалар боғчасини очиш учун бизнес-режа.', ru: 'Бизнес-план для открытия частного детского сада.', en: 'Business plan for opening a private kindergarten.', kaa: 'Jeke bala baqshasın ashıw ushın biznes-joba.' },
+        category: 'business', badge: 'DOC', imageUrl: 'https://images.unsplash.com/photo-1526379879527-8559ecfcaec0?w=600&q=80&auto=format&fit=crop', hasFile: false },
+      { id: 3,
+        title: { uz: 'Паррандачилик хужалиги', ru: 'Птицеводческое хозяйство', en: 'Poultry Farm Business Plan', kaa: 'Qusshılıq xojalıǵı' },
+        description: { uz: 'Паррандачилик хўжалигини ташкил этиш бўйича тўлиқ бизнес-режа шаблони.', ru: 'Полный шаблон бизнес-плана для организации птицеводческого хозяйства.', en: 'Complete business plan template for a poultry farm.', kaa: 'Qusshılıq xojalıǵın shólkemlestiríw ushın tolıq biznes-joba.' },
+        category: 'business', badge: 'DOC', imageUrl: 'https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=600&q=80&auto=format&fit=crop', hasFile: false },
+      { id: 4,
+        title: { uz: 'Автомойка', ru: 'Автомойка: бизнес-план', en: 'Car Wash Business Plan', kaa: 'Avtomoyqa biznes-jobası' },
+        description: { uz: 'Автомойка бизнесини очиш учун бизнес-режа.', ru: 'Бизнес-план для открытия автомойки. Оборудование, расходы и прогноз доходов.', en: 'Business plan for opening a car wash.', kaa: 'Avtomoyqa ashıw ushın biznes-joba.' },
+        category: 'business', badge: 'DOC', imageUrl: 'https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=600&q=80&auto=format&fit=crop', hasFile: false },
+      { id: 5,
+        title: { uz: 'Биогумус етиштириш', ru: 'Производство биогумуса', en: 'Biohumus Production', kaa: 'Biogumus óndiriw' },
+        description: { uz: 'Биогумус (вермикомпост) ишлаб чиқариш бўйича бизнес-режа шаблони.', ru: 'Шаблон бизнес-плана для производства биогумуса.', en: 'Business plan template for biohumus production.', kaa: 'Biogumus óndiriw boyınsha biznes-joba shablonı.' },
+        category: 'business', badge: 'DOC', imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&q=80&auto=format&fit=crop', hasFile: false },
+      { id: 6,
+        title: { uz: 'Когоз салфетка ишлаб чикариш', ru: 'Производство бумажных салфеток', en: 'Paper Napkin Production', kaa: 'Qağaz salfetka óndiriw' },
+        description: { uz: 'Қоғоз салфетка ишлаб чиқариш цехини ташкиллаштириш учун бизнес-режа.', ru: 'Бизнес-план для организации производства бумажных салфеток.', en: 'Business plan for paper napkin production.', kaa: 'Qağaz salfetka óndiriw cexin shólkemlestiríw ushın biznes-joba.' },
+        category: 'business', badge: 'DOC', imageUrl: 'https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=600&q=80&auto=format&fit=crop', hasFile: false },
+      { id: 7,
+        title: { uz: 'Пластик махсулотлар ишлаб чикариш', ru: 'Производство пластиковых изделий', en: 'Plastic Products Manufacturing', kaa: 'Plastik ónimlerin óndiriw' },
+        description: { uz: 'Пластик маҳсулотлар ишлаб чиқариш бўйича тўлиқ бизнес-режа.', ru: 'Полный бизнес-план для производства пластиковых изделий.', en: 'Complete business plan for plastic products manufacturing.', kaa: 'Plastik ónimlerin óndiriw boyınsha tolıq biznes-joba.' },
+        category: 'business', badge: 'DOC', imageUrl: 'https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?w=600&q=80&auto=format&fit=crop', hasFile: false },
+      { id: 8,
+        title: { uz: 'Чехол-полик тикиш цехини ташкиллаштириш', ru: 'Цех по пошиву чехлов и ковриков', en: 'Car Cover & Mat Sewing Workshop', kaa: 'Qap-polıq tikiw cexin shólkemlestiríw' },
+        description: { uz: 'Автомобиль чехол ва полик тикиш цехини ташкиллаштириш бўйича бизнес-режа.', ru: 'Бизнес-план для цеха по пошиву автомобильных чехлов и ковриков.', en: 'Business plan for car cover and mat sewing workshop.', kaa: 'Avtomobil qap hám polıq tikiw cexin shólkemlestiríw boyınsha biznes-joba.' },
+        category: 'business', badge: 'DOC', imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&auto=format&fit=crop', hasFile: false },
+    ];
+
+    let allTemplates = [];
+    let currentFilter = 'all';
+
+    function getLang() { return localStorage.getItem('language') || 'ru'; }
+
+    function getLocalText(obj) {
+      if (!obj) return '';
+      if (typeof obj === 'string') return obj;
+      const lang = getLang();
+      return obj[lang] || obj['ru'] || obj['uz'] || obj['en'] || '';
+    }
+
+    function normalizeTemplate(t) {
+      if (typeof t.title === 'object') return t;
+      return {
+        ...t,
+        title: { uz: t.title||'', ru: t.titleRu||t.title||'', en: t.titleEn||t.title||'', kaa: t.titleKaa||t.title||'' },
+        description: { uz: t.description||'', ru: t.descriptionRu||t.description||'', en: t.descriptionEn||t.description||'', kaa: t.descriptionKaa||t.description||'' },
+      };
+    }
+
+    async function loadTemplatesPage() {
+      const apiBase = (typeof API_BASE !== 'undefined' && API_BASE) ? API_BASE : 'http://localhost:8080';
+      // Show defaults immediately
+      allTemplates = DEFAULT_TEMPLATES;
+      renderTemplates();
+      buildFilters();
+      // Fetch from backend
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        const res = await fetch(`${apiBase}/api/v1/templates`, { signal: controller.signal });
+        clearTimeout(timeout);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.length) {
+          // Mark templates with real hasFile from server
+          allTemplates = data;
+          renderTemplates();
+          buildFilters();
+        }
+      } catch (e) {
+        console.warn('Templates API:', e.message);
+        // Keep defaults with hasFile:true (shows download button pointing to API)
+      }
+    }
+
+    function buildFilters() {
+      document.getElementById('filterBar').querySelectorAll('.filter-btn').forEach(btn => {
+        btn.onclick = () => setFilter(btn.dataset.cat);
+      });
+    }
+
+    function setFilter(cat) {
+      currentFilter = cat;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+      renderTemplates();
+    }
+
+    function renderTemplates() {
+      const grid = document.getElementById('templatesPageGrid');
+      const filtered = (currentFilter === 'all' ? allTemplates : allTemplates.filter(t => t.category === currentFilter))
+        .map(normalizeTemplate);
+
+      if (!filtered.length) {
+        grid.innerHTML = '<div class="templates-empty"><p>No templates found.</p></div>';
+        return;
+      }
+
+      const apiBase = (typeof API_BASE !== 'undefined' && API_BASE) ? API_BASE : 'http://localhost:8080';
+      const lang = getLang();
+      const dlLabels = { uz: 'Yuklab olish', ru: 'Скачать', en: 'Download', kaa: 'Júklew' };
+      const reqLabels = { uz: "Shablon so'rash", ru: 'Запросить шаблон', en: 'Request Template', kaa: 'Úlgi soraw' };
+
+      grid.innerHTML = filtered.map(t => {
+        const title = getLocalText(t.title);
+        const desc  = getLocalText(t.description);
+        const dlBtn = t.hasFile
+          ? `<a href="${apiBase}/api/v1/templates/${t.id}/download" class="tpl-download-btn" download>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              ${escapeHtml(dlLabels[lang]||'Скачать')}
+            </a>`
+          : `<a href="index.html#contact" class="tpl-download-btn no-file">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              ${escapeHtml(reqLabels[lang]||'Запросить шаблон')}
+            </a>`;
+        const imgHtml = t.imageUrl
+          ? `<img class="tpl-card-img" src="${escapeHtml(t.imageUrl)}" alt="${escapeHtml(title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="tpl-card-img-placeholder" style="display:none">${CAT_ICONS[t.category]||'📄'}</div>`
+          : `<div class="tpl-card-img-placeholder">${CAT_ICONS[t.category]||'📄'}</div>`;
+        return `<div class="tpl-card reveal">
+          <div class="tpl-card-preview">${imgHtml}<span class="tpl-badge">${escapeHtml(t.badge||'DOC')}</span></div>
+          <div class="tpl-card-body">
+            <div class="tpl-card-title">${escapeHtml(title)}</div>
+            <div class="tpl-card-desc">${escapeHtml(desc)}</div>
+            ${dlBtn}
+          </div>
+        </div>`;
+      }).join('');
+
+      document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+      if (typeof setLanguage === 'function') setLanguage(getLang());
+    }
+
+    function requestTemplate(id, title) { window.location.href = 'index.html#contact'; }
+
+        // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      loadTemplatesPage();
+      // filter bar click handlers
+      document.getElementById('filterBar').querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => setFilter(btn.dataset.cat));
+      });
+    });
+  </script>
+</body>
+</html>

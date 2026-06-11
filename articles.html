@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com blob:; connect-src 'self' http://localhost:8080 http://127.0.0.1:8080 https://api.mkbusiness.uz;" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="MK Business Articles — Insights on business strategy, analytics, economics, and practical business advice." />
+  <title>Articles — MK Business Insights & Analysis</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .brand-logo-img { height: 36px; width: auto; display: block; object-fit: contain; }
+    .brand-mark { display: none; }
+    .brand { gap: 0.5rem; }
+    .footer-brand .brand-mark { display: none; }
+    .footer-logo-img { height: 32px; width: auto; filter: brightness(0) invert(1); opacity: 0.9; }
+    .site-header.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.1); }
+    .hero {
+      min-height: 62vh;
+      padding: 4.5rem 1.75rem 3rem;
+      background:
+        linear-gradient(135deg, rgba(0, 28, 70, 0.92) 0%, rgba(0, 88, 215, 0.72) 100%),
+        url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1800&q=80&auto=format&fit=crop') center/cover no-repeat;
+      color: white;
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      border-radius: 2rem;
+      box-shadow: 0 26px 80px rgba(15, 23, 42, 0.16);
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(1, 18, 46, 0.32);
+      mix-blend-mode: multiply;
+    }
+    .hero-copy {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      text-align: center;
+      width: 100%;
+    }
+    .hero h1, .hero .eyebrow { color: white; }
+    .hero h1 {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.05;
+      max-width: 100%;
+      word-wrap: break-word;
+      margin: 0 0 1.25rem 0;
+      letter-spacing: -0.03em;
+    }
+    .hero p {
+      color: rgba(255,255,255,0.88);
+      max-width: 720px;
+      margin: 0 auto;
+      line-height: 1.8;
+      font-size: 1.05rem;
+    }
+    .section-intro {
+      max-width: 900px;
+      margin: 0 auto 3rem;
+      text-align: center;
+    }
+    .section-intro h2 {
+      font-size: clamp(2rem, 3vw, 2.6rem);
+      margin-bottom: 1rem;
+      color: #0f172a;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+    .section-intro p {
+      color: rgba(17, 24, 39, 0.75);
+      line-height: 1.75;
+    }
+    .articles-grid {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      grid-auto-rows: 1fr;
+    }
+    .article-card {
+      background: var(--surface);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+      transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      text-decoration: none;
+      color: inherit;
+      min-height: 100%;
+    }
+    .article-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 34px 90px rgba(15, 23, 42, 0.12);
+      border-color: rgba(37, 99, 235, 0.2);
+    }
+    .article-image {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      transition: transform 0.45s ease, filter 0.45s ease;
+      display: block;
+      filter: brightness(0.98) saturate(1.05);
+      margin: 0;
+    }
+    .article-card:hover .article-image { transform: scale(1.05); }
+    .article-card-body {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .article-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      margin-bottom: 0.25rem;
+      font-size: 0.84rem;
+      color: var(--text-light);
+    }
+    .article-category {
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .article-date {
+      color: rgba(17, 24, 39, 0.65);
+    }
+    .article-card h3 {
+      font-size: 1.3rem;
+      line-height: 1.35;
+      margin: 0;
+      color: var(--text);
+      min-height: 4rem;
+    }
+    .article-card p {
+      margin: 0;
+      color: var(--text-secondary);
+      line-height: 1.85;
+      flex-grow: 1;
+      min-height: 4rem;
+    }
+    .article-card-footer {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: gap 0.2s ease;
+    }
+    .article-card:hover .article-card-footer {
+      gap: 0.7rem;
+    }
+    #loadMoreBtn {
+      background: var(--accent);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 14px 30px rgba(37, 99, 235, 0.2);
+    }
+    #loadMoreBtn:hover {
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+      color: white;
+    }
+    @media (max-width: 1200px) {
+      .articles-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      }
+    }
+    @media (max-width: 768px) {
+      .hero {
+        padding: 3.75rem 1.25rem 2.5rem;
+      }
+      .article-card-body {
+        padding: 1.5rem;
+      }
+      .articles-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .hero {
+        padding: 3rem 1rem 2rem;
+        border-radius: 1.25rem;
+      }
+      .article-image {
+        height: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" class="brand brand-link">
+      <img class="brand-logo-img" src="logos/10.png" alt="MK Business Logo" />
+    </a>
+    <nav class="site-nav">
+      <a href="index.html#services" class="nav-link" data-en="Services" data-ru="Услуги" data-uz="Xizmatlar" data-kaa="Qyzmetler">Services</a>
+      <a href="index.html#about" class="nav-link" data-en="About" data-ru="О нас" data-uz="Biz haqimizda" data-kaa="Biz haqqında">About</a>
+      <a href="articles.html" class="nav-link active" data-en="Articles" data-ru="Статьи" data-uz="Maqolalar" data-kaa="Maqalalar">Articles</a>
+      <a href="index.html#contact" class="nav-link" data-en="Contact" data-ru="Контакты" data-uz="Bog'lanish" data-kaa="Baylanish">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <div class="language-dropdown">
+        <button id="langToggle" class="lang-toggle" data-en="Language" data-ru="Язык" data-uz="Til" data-kaa="Til">Language</button>
+        <div id="langMenu" class="lang-menu">
+          <button class="lang-option" data-lang="en">English</button>
+          <button class="lang-option" data-lang="ru">Русский</button>
+          <button class="lang-option" data-lang="uz">O'zbekcha</button>
+          <button class="lang-option" data-lang="kaa">Qaraqalpaqsha</button>
+        </div>
+      </div>
+    </div>
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu" onclick="toggleMobileMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow" data-en="Business Insights" data-ru="Бизнес-идеи" data-uz="Biznes tushunchalari" data-kaa="Biznes idealar">Business Insights</p>
+        <h1 data-en="Strategic Perspectives for Modern Business Leaders" data-ru="Стратегия для лидеров бизнеса" data-uz="Biznes rahbarlari uchun strategiya" data-kaa="Biznes basshıları ushın strategiya">Strategic Business Insights</h1>
+        <p style="font-size:1.05rem;color:rgba(255,255,255,0.85);margin:1.5rem 0 0;max-width:700px;margin-left:auto;margin-right:auto;"
+          data-en="Explore in-depth articles on business strategy, financial analytics, market insights, and practical advice to drive your organization forward."
+          data-ru="Изучите статьи о бизнес-стратегии, финансовой аналитике, рыночных тенденциях и практических советах."
+          data-uz="Biznes strategiyasi, moliyaviy tahlil, bozor trendlari va amaliy maslahatlar bo'yicha maqolalarni o'rganing."
+          data-kaa="Biznes strategiyası, finanslıq talqılaw, bazar trendleri hám ámeliy keńesler boyınsha maqalalardı oqıń.">
+          Explore in-depth articles on business strategy, financial analytics, market insights, and practical advice to drive your organization forward.
+        </p>
+      </div>
+    </section>
+    
+    <section style="padding: 5rem 2rem;">
+      <div class="section-intro">
+        <p class="section-tag" data-en="Insights" data-ru="Аналитика" data-uz="Tahlil" data-kaa="Talqılaw">Insights</p>
+        <h2 data-en="A curated library of expert business analysis" data-ru="Кураторская библиотека экспертного бизнес-анализа" data-uz="Ekspert biznes tahlili uchun saralangan kutubxona" data-kaa="Ekspertlik biznes analizi kuratorlik kitapxanası.">A curated library of expert business analysis</h2>
+        <p data-en="Each article is designed to help leaders make smarter decisions, strengthen strategy, and accelerate growth." data-ru="Каждая статья помогает лидерам принимать более обоснованные решения, укреплять стратегию и ускорять рост." data-uz="Har bir maqola rahbarlarga aqlli qarorlar qabul qilish, strategiyani kuchaytirish va o'sishni tezlashtirishda yordam beradi." data-kaa="Hár bir maqala basshılarǵa jáne de durıslı qararlar qabıl etiwge, strategiyanı bekkemlewge hám ósiwdi jedellestiriwge járdem beredi.">Each article is designed to help leaders make smarter decisions, strengthen strategy, and accelerate growth.</p>
+      </div>
+      <div class="articles-grid" id="articlesGrid"></div>
+      <div class="text-center" style="margin-top: 2rem;">
+        <button id="loadMoreBtn" class="button button-secondary" data-en="Read more articles" data-ru="Показать еще статьи" data-uz="Boshqa maqolalarni ko'rish" data-kaa="Jáne maqalalardı kórsetiw" data-en-readless="Read less articles" data-ru-readless="Свернуть статьи" data-uz-readless="Maqolalarni yashirish" data-kaa-readless="Maqalalardy jasırıw">Read more articles</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p data-en="Strategic consulting for sustainable business growth across Central Asia." data-ru="Стратегический консалтинг для устойчивого развития бизнеса по всей Центральной Азии." data-uz="Markaziy Asiyada barqaror biznes o'sishi uchun strategik konsalting." data-kaa="Orta Aziya boylap biznesti turaqlı rawajlandırıw ushın strategiyalıq konsalting.">Strategic consulting for sustainable business growth across Central Asia.</p>
+    <p>&copy; 2026 MK Business. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    // Real Unsplash images for each article category
+    const articles = [
+      {
+        id: 7,
+        title: { en: "Business Grants: Why Karakalpakstan Entrepreneurs Should Pay Attention to International Funding", ru: "Гранты для бизнеса: почему предпринимателям Каракалпакстана стоит обратить внимание на международное финансирование", uz: "Biznes uchun grantlar: nima uchun Qoraqalpog'iston tadbirkorlari xalqaro moliyalashtirishga e'tibor qaratishlari kerak?", kaa: "Biznes ushın grantlar: nege Qaraqalpaqstan iskerlerine xalıqaralıq finanslandırıwǵa itibar beriw kerek?" },
+        description: { en: "International foundations are increasingly financing business projects. For Karakalpakstan this is a unique opportunity — the region is at the center of attention of international organizations due to the Aral Sea situation.", ru: "Международные фонды всё активнее финансируют бизнес-проекты. Для Каракалпакстана это уникальная возможность — регион в центре внимания международных организаций из-за ситуации Приаралья и устойчивого развития.", uz: "Xalqaro jamg'armalar tobora ko'proq biznes loyihalarini moliyalashtirmoqda. Qoraqalpog'iston uchun bu noyob imkoniyat.", kaa: "Xalıqaralıq qorlar barǵan sayın kóbirek biznes loyihaların finanslandırıwda. Qaraqalpaqstan ushın bul nádik múmkinshilik." },
+        category: { en: "Grants & Projects", ru: "Гранты и проекты", uz: "Grantlar va loyihalar", kaa: "Grantlar hám loyihalar" },
+        date: "May 1, 2025",
+        image: "images/grants-business.jpeg"
+      },
+      {
+        id: 8,
+        title: { en: "Karakalpakstan and the IT Sector: Why the Region Could Become Central Asia's New Digital Hub", ru: "Каракалпакстан и IT-сектор: почему регион может стать новой цифровой площадкой Центральной Азии", uz: "Qoraqalpog'iston va IT-sektor: nima uchun mintaqa Markaziy Osiyoning yangi raqamli maydonchasiga aylanishi mumkin", kaa: "Qaraqalpaqstan hám IT-sektor: nege region Orta Aziyanyń jańa sanli maydanına aylanıwı múmkin" },
+        description: { en: "IT services exports grew by almost 1000%, IT Park residents are growing. Karakalpakstan is forming a new digital identity.", ru: "Экспорт IT-услуг вырос почти на 1000%, резидентов IT Park становится всё больше. Каракалпакстан формирует новую цифровую идентичность.", uz: "IT xizmatlari eksporti deyarli 1000% ga oshdi. Qoraqalpog'iston yangi raqamli o'ziga xoslikni shakllantirib, xalqaro hamkorlarni jalb qilmoqda.", kaa: "IT xizmetler eksportı deyarli 1000% ósip barıwda. Qaraqalpaqstan jańa sanli sıpatın qáliplestirip, xalıqaralıq sheriklerdi jalb etpekte." },
+        category: { en: "Digital & Technology", ru: "Цифровые технологии", uz: "Raqamli texnologiyalar", kaa: "Sanli texnologiyalar" },
+        date: "April 15, 2025",
+        image: "images/karakalpakstan-it.jpeg"
+      },
+      {
+        id: 1,
+        title: { en: "Accelerating Growth with a Market Expansion Framework", ru: "Ускорение роста с помощью стратегии выхода на рынок", uz: "Bozorga chiqish strategiyasi bilan o'sishni tezlashtirish", kaa: "Bazarǵa kiriw strategiyası menen ósiwdi tezlestiriw." },
+        description: { en: "How focused market expansion and disciplined execution help businesses scale profitably across new regions.", ru: "Как сфокусированное расширение рынка и дисциплинированная реализация помогают компаниям расти с прибылью.", uz: "Bozorga qaratilgan kengayish va intizomli ijro yordamida kompaniyalar yangi hududlarda foydali ravishda kengayadi.", kaa: "Bazardıń baǵdarlanǵan keńeyiwi hám intizamlı satılıwı kompaniyalarǵa qalay payda menen ósiwge járdem beredi?." },
+        category: { en: "Business Strategy", ru: "Бизнес-стратегия", uz: "Biznes strategiyasi", kaa: "Biznes strategiyasi" },
+        date: "March 18, 2026",
+        image: "images/b2b-business.png"
+      },
+      {
+        id: 2,
+        title: { en: "Financial Resilience as a Competitive Advantage", ru: "Финансовая устойчивость как конкурентное преимущество", uz: "Moliyaviy chidamlilikni raqobat ustunligiga aylantirish", kaa: "Maliyee tudamlılıgyni raqobat ustinligi retinde paydalanuw" },
+        description: { en: "Practical approaches to strengthen cash flow, risk management, and long-term planning for more resilient performance.", ru: "Практические подходы к укреплению денежного потока, управления рисками и долгосрочного планирования.", uz: "Naqd pul oqimi, xavflarni boshqarish va uzoq muddatli rejalashtirishni kuchaytirish bo'yicha amaliy yondashuvlar.", kaa: "Pul oqimini mustahkamlash, risklarni boshqarish va uzoq muddatli rejalashtirishning amaliy yondashuvlari." },
+        category: { en: "Finance & Economics", ru: "Финансы и экономика", uz: "Moliya va iqtisodiyot", kaa: "Finans hám ekonomika" },
+        date: "March 12, 2026",
+        image: "images/article-investors.png"
+      },
+      {
+        id: 3,
+        title: { en: "Understanding Central Asian Market Dynamics", ru: "Понимание динамики рынков Центральной Азии", uz: "Markaziy Osiyo bozor dinamikasini tushunish", kaa: "Oraylıq Aziya bazar dinamikasyn túsiniksiwi" },
+        description: { en: "Gain competitive insights into the unique opportunities and challenges of doing business in Central Asia.", ru: "Получите конкурентные преимущества благодаря пониманию рынка Центральной Азии.", uz: "Markaziy Osiyoda biznes qilishning o'ziga xos imkoniyatlari va qiyinchliklari haqida bilim oling.", kaa: "Oraylıq Aziyadá biznes qıliwniń özine xas imkoniyyatleri jane qıynshıqlıqlary haqqında bilim alıw." },
+        category: { en: "Market Analysis", ru: "Анализ рынка", uz: "Bozor tahlili", kaa: "Bazar talqılaw" },
+        date: "March 5, 2026",
+        image: "images/karakalpakstan-digital.jpeg"
+      },
+      {
+        id: 4,
+        title: { en: "Building Resilient Financial Strategies for SMEs", ru: "Построение устойчивых финансовых стратегий для МСП", uz: "KMT uchun mustahkam moliyaviy strategiyalar qurish", kaa: "KMT üshin mustahkam malııe strategiyalar qurıw" },
+        description: { en: "Practical financial planning strategies to ensure long-term sustainability and growth for small and medium enterprises.", ru: "Практические финансовые стратегии для обеспечения долгосрочной стабильности малых и средних предприятий.", uz: "Kichik va o'rta korxonalar uchun uzoq muddatli barqarorlik va o'sishni ta'minlash uchun amaliy moliyaviy strategiyalar.", kaa: "Kishi hám orta kárxanalardıń uzaq múddetli turaqlılıǵın támiyinlewde ámeliy finanslıq strategiyalar." },
+        category: { en: "Finance & Economics", ru: "Финансы и экономика", uz: "Moliya va iqtisodiyot", kaa: "Finans hám ekonomika" },
+        date: "February 28, 2026",
+        image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80&auto=format&fit=crop"
+      },
+      {
+        id: 5,
+        title: { en: "The Future of Remote Work in Business Operations", ru: "Будущее удаленной работы в деловых операциях", uz: "Masofadan ish qilishning biznes operatsiyalardagi kelajagi", kaa: "Masofadan ish qıliwniń biznes operatsiyalarındağı keleshegi" },
+        description: { en: "Explore how remote work is reshaping organizational structures and discover strategies for building effective distributed teams.", ru: "Изучите, как удаленная работа переформатирует организационные структуры и стратегии управления командами.", uz: "Masofadan ish tashkiliy tuzilmalarni qayta shakllantirish haqida o'rganing va samarali taqsimot jamoalarini boshqaring.", kaa: "Aralıqtan islew shólkemlestiriw strukturaları hám toparlardı basqarıw strategiyaların qalay qayta formatlawın úyreniń.." },
+        category: { en: "Organizational Development", ru: "Развитие организации", uz: "Tashkilot rivojlanishi", kaa: "shólkemniń rawajlanıwı" },
+        date: "February 22, 2026",
+        image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&q=80&auto=format&fit=crop"
+      },
+      {
+        id: 6,
+        title: { en: "The New Rules of Remote Work for High-Performing Teams", ru: "Новые правила удаленной работы для высокоэффективных команд", uz: "Yuqori samarali jamoalar uchun masofadan ishlashning yangi qoidalari", kaa: "Joqarı samaralı komandalar üshin masofadan ish qıliwnıń jańa qaideleri" },
+        description: { en: "Remote work is evolving fast. Learn how modern teams stay productive, connected and empowered in hybrid workplaces.", ru: "Удаленная работа быстро меняется. Узнайте, как современные команды остаются продуктивными и сплоченными.", uz: "Masofadan ishlash tez o'zgarmoqda. Zamonaviy jamoalar qanday qilib samarali va bog'langan bo'lib qolishini bilib oling.", kaa: "Aralıqtan islesiw tez ózgeredi. Zamanagóy toparlar qalayınsha nátiyjeli hám awızbirshilikli bolıp qalatuǵının bilip alıń." },
+        category: { en: "Organizational Development", ru: "Развитие организации", uz: "Tashkilot rivojlanishi", kaa: "shólkemniń rawajlanıwı" },
+        date: "February 22, 2026",
+        image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&q=80&auto=format&fit=crop"
+      }
+    ];
+
+    const INITIAL_ARTICLE_COUNT = 2;
+    let isExpanded = false;
+
+    function getLocalizedText(element, lang, suffix) {
+      const attrName = `data-${lang}${suffix ? `-${suffix}` : ''}`;
+      return element.getAttribute(attrName) || element.getAttribute(`data-${lang}`) || element.textContent;
+    }
+
+    const READ_MORE_LABELS = {
+      en: 'Read full insight →',
+      ru: 'Прочитать полный обзор →',
+      uz: "To'liq ko'rib chiqish →",
+      kaa: 'Tolıq kózdesu →'
+    };
+
+    function renderArticles(count = INITIAL_ARTICLE_COUNT) {
+      const grid = document.getElementById('articlesGrid');
+      const loadMoreBtn = document.getElementById('loadMoreBtn');
+      const lang = localStorage.getItem('language') || 'en';
+      const visibleArticles = articles.slice(0, count);
+      const readLabel = READ_MORE_LABELS[lang] || READ_MORE_LABELS.en;
+
+      grid.innerHTML = visibleArticles.map((a, i) => `
+        <a href="article-detail.html?id=${a.id}" class="article-card reveal" style="animation-delay:${i*0.07}s">
+          <img src="${a.image}" alt="${a.title[lang]}" class="article-image" loading="lazy" />
+          <div class="article-card-body">
+            <div class="article-meta">
+              <span class="article-category">${a.category[lang]}</span>
+              <span class="article-date">${a.date}</span>
+            </div>
+            <h3>${a.title[lang]}</h3>
+            <p>${a.description[lang]}</p>
+            <span data-en="Read full insight →" data-ru="Прочитать полный обзор →" data-uz="To'liq ko'rib chiqish →" data-kaa="Tolıq kózdesu →" class="article-card-footer">${readLabel}</span>
+          </div>
+        </a>
+      `).join('');
+
+      if (loadMoreBtn) {
+        if (count >= articles.length) {
+          loadMoreBtn.textContent = getLocalizedText(loadMoreBtn, lang, 'readless');
+          loadMoreBtn.style.display = 'inline-flex';
+        } else {
+          loadMoreBtn.textContent = getLocalizedText(loadMoreBtn, lang, 'readmore');
+          loadMoreBtn.style.display = 'inline-flex';
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderArticles();
+
+      const loadMoreBtn = document.getElementById('loadMoreBtn');
+      if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', () => {
+          isExpanded = !isExpanded;
+          renderArticles(isExpanded ? articles.length : INITIAL_ARTICLE_COUNT);
+        });
+      }
+    });
+    window.addEventListener('languagechange', () => {
+      renderArticles(isExpanded ? articles.length : INITIAL_ARTICLE_COUNT);
+    });
+    window.addEventListener('scroll', () => {
+      const header = document.querySelector('.site-header');
+      if (window.scrollY > 10) header.classList.add('scrolled');
+      else header.classList.remove('scrolled');
+    });
+  </script>
+</body>
+</html>
