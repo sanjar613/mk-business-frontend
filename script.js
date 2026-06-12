@@ -1,761 +1,395 @@
-function getToken() {
-  // sessionStorage preferred (clears on tab close)
-  return sessionStorage.getItem('adminToken') || null;
+/* ============================================================
+   MK Business Corp — PUBLIC SITE SCRIPT  (DEMO / MOCK BUILD)
+   ------------------------------------------------------------
+   В этой версии НЕТ ни одного реального запроса к бэкенду.
+   Все данные (шаблоны бизнес-планов, контакты) живут в памяти
+   браузера. Любой запрос вида /api/v1/... перехватывается и
+   возвращает фейковые данные мгновенно, без сети.
+   ============================================================ */
+
+/* ---------- маленькие утилиты ---------- */
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
-// Safe HTML sanitizer — strip dangerous tags/attrs
 function sanitizeHtml(html) {
   const div = document.createElement('div');
   div.textContent = String(html || '');
   return div.innerHTML;
 }
 
-// Вспомогательная функция для безопасного вывода текста в HTML
-function escapeHtml(str) {
-  if (!str) return '';
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+function getToken() {
+  return sessionStorage.getItem('adminToken') || null;
 }
-
-// ============================================================
-// CONFIG: замени на URL твоего бэкенда после деплоя на Render
-// Например: 'https://mk-business-api.onrender.com'
-// ============================================================
-const API_BASE = 'https://api.mkbusiness.uz';
 
 function authHeaders() {
-  const token = getToken();
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': token ? `Bearer ${token}` : ''
-  };
+  return { 'Content-Type': 'application/json' };
 }
 
-function handleAuthError(response) {
-  if (response.status === 401 || response.status === 403) {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('isLoggedIn');
-    sessionStorage.removeItem('adminToken');
-    sessionStorage.removeItem('adminUser');
-    localStorage.removeItem('adminUser');
-    window.location.href = 'login.html';
-    return true;
+/* Оставлено для совместимости со старым кодом — реальный URL не используется */
+const API_BASE = 'https://api.mkbusiness.uz';
+
+function getLang() {
+  return localStorage.getItem('language') || 'ru';
+}
+
+/* ============================================================
+   ФЕЙКОВЫЕ ДАННЫЕ — 8 шаблонов бизнес-планов
+   Та же форма данных, что ждёт templates.html.
+   ============================================================ */
+const MOCK_TEMPLATES = [
+  {
+    id: 1, category: 'business', badge: 'DOC', hasFile: false, published: true, sortOrder: 1,
+    imageUrl: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=600&q=80&auto=format&fit=crop',
+    title: { uz: 'Тикув цехини ташкиллаштириш', ru: 'Швейный цех: организация производства', en: 'Sewing Workshop Business Plan', kaa: 'Tikiw cexin shólkemlestiríw' },
+    description: { uz: 'Тикув цехи бизнесини ташкиллаштириш учун тайёр бизнес-режа шаблони.', ru: 'Готовый шаблон бизнес-плана для организации швейного цеха: оборудование, штат, расчёт себестоимости.', en: 'Ready business plan template for organizing a sewing workshop.', kaa: 'Tikiw cexin shólkemlestiríw ushın tayın biznes-joba shablonı.' }
+  },
+  {
+    id: 2, category: 'business', badge: 'DOC', hasFile: false, published: true, sortOrder: 2,
+    imageUrl: 'https://images.unsplash.com/photo-1526379879527-8559ecfcaec0?w=600&q=80&auto=format&fit=crop',
+    title: { uz: 'Хусусий болалар богчаси', ru: 'Частный детский сад', en: 'Private Kindergarten Business Plan', kaa: 'Jeke bala baqsha' },
+    description: { uz: 'Хусусий болалар боғчасини очиш учун бизнес-режа.', ru: 'Бизнес-план для открытия частного детского сада: лицензирование, помещение, финансовая модель.', en: 'Business plan for opening a private kindergarten.', kaa: 'Jeke bala baqshasın ashıw ushın biznes-joba.' }
+  },
+  {
+    id: 3, category: 'business', badge: 'DOC', hasFile: false, published: true, sortOrder: 3,
+    imageUrl: 'https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=600&q=80&auto=format&fit=crop',
+    title: { uz: 'Паррандачилик хужалиги', ru: 'Птицеводческое хозяйство', en: 'Poultry Farm Business Plan', kaa: 'Qusshılıq xojalıǵı' },
+    description: { uz: 'Паррандачилик хўжалигини ташкил этиш бўйича тўлиқ бизнес-режа шаблони.', ru: 'Полный шаблон бизнес-плана для организации птицеводческого хозяйства.', en: 'Complete business plan template for a poultry farm.', kaa: 'Qusshılıq xojalıǵın shólkemlestiríw ushın tolıq biznes-joba.' }
+  },
+  {
+    id: 4, category: 'business', badge: 'DOC', hasFile: false, published: true, sortOrder: 4,
+    imageUrl: 'https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=600&q=80&auto=format&fit=crop',
+    title: { uz: 'Автомойка', ru: 'Автомойка: бизнес-план', en: 'Car Wash Business Plan', kaa: 'Avtomoyqa biznes-jobası' },
+    description: { uz: 'Автомойка бизнесини очиш учун бизнес-режа.', ru: 'Бизнес-план для открытия автомойки: оборудование, расходы и прогноз доходов.', en: 'Business plan for opening a car wash.', kaa: 'Avtomoyqa ashıw ushın biznes-joba.' }
+  },
+  {
+    id: 5, category: 'business', badge: 'DOC', hasFile: false, published: true, sortOrder: 5,
+    imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&q=80&auto=format&fit=crop',
+    title: { uz: 'Биогумус етиштириш', ru: 'Производство биогумуса', en: 'Biohumus Production', kaa: 'Biogumus óndiriw' },
+    description: { uz: 'Биогумус (вермикомпост) ишлаб чиқариш бўйича бизнес-режа шаблони.', ru: 'Шаблон бизнес-плана для производства биогумуса (вермикомпоста).', en: 'Business plan template for biohumus production.', kaa: 'Biogumus óndiriw boyınsha biznes-joba shablonı.' }
+  },
+  {
+    id: 6, category: 'business', badge: 'DOC', hasFile: false, published: true, sortOrder: 6,
+    imageUrl: 'https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=600&q=80&auto=format&fit=crop',
+    title: { uz: 'Когоз салфетка ишлаб чикариш', ru: 'Производство бумажных салфеток', en: 'Paper Napkin Production', kaa: 'Qағaz salfetka óndiriw' },
+    description: { uz: 'Қоғоз салфетка ишлаб чиқариш цехини ташкиллаштириш учун бизнес-режа.', ru: 'Бизнес-план для организации производства бумажных салфеток.', en: 'Business plan for paper napkin production.', kaa: 'Qағaz salfetka óndiriw cexin shólkemlestiríw ushın biznes-joba.' }
+  },
+  {
+    id: 7, category: 'business', badge: 'DOC', hasFile: false, published: true, sortOrder: 7,
+    imageUrl: 'https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?w=600&q=80&auto=format&fit=crop',
+    title: { uz: 'Пластик махсулотлар ишлаб чикариш', ru: 'Производство пластиковых изделий', en: 'Plastic Products Manufacturing', kaa: 'Plastik ónimlerin óndiriw' },
+    description: { uz: 'Пластик маҳсулотлар ишлаб чиқариш бўйича тўлиқ бизнес-режа.', ru: 'Полный бизнес-план для производства пластиковых изделий.', en: 'Complete business plan for plastic products manufacturing.', kaa: 'Plastik ónimlerin óndiriw boyınsha tolıq biznes-joba.' }
+  },
+  {
+    id: 8, category: 'business', badge: 'DOC', hasFile: false, published: true, sortOrder: 8,
+    imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&auto=format&fit=crop',
+    title: { uz: 'Чехол-полик тикиш цехини ташкиллаштириш', ru: 'Цех по пошиву чехлов и ковриков', en: 'Car Cover & Mat Sewing Workshop', kaa: 'Qap-polıq tikiw cexin shólkemlestiríw' },
+    description: { uz: 'Автомобиль чехол ва полик тикиш цехини ташкиллаштириш бўйича бизнес-режа.', ru: 'Бизнес-план для цеха по пошиву автомобильных чехлов и ковриков.', en: 'Business plan for a car cover and mat sewing workshop.', kaa: 'Avtomobil qap hám polıq tikiw cexin shólkemlestiríw boyınsha biznes-joba.' }
   }
-  return false;
-}
+];
 
-let currentLanguage = localStorage.getItem('language') || 'en';
-let editingItemId = null;
-let editingFeedbackId = null;
-let editingLearningId = null;
-let editingTemplateId = null;
+/* Фейковые контакты (на случай, если их кто-то запросит, + сюда падают
+   заявки с формы на главной — в памяти текущей сессии). */
+const MOCK_CONTACTS = [
+  { id: 1, firstName: 'Азиз', lastName: 'Каримов', email: 'aziz.karimov@mail.uz', message: 'Здравствуйте! Хочу заказать бизнес-план для швейного цеха.', status: 'NEW', createdAt: new Date(Date.now() - 2 * 864e5).toISOString() },
+  { id: 2, firstName: 'Дилноза', lastName: 'Юсупова', email: 'dilnoza.y@gmail.com', message: 'Интересует консультация по грантам для малого бизнеса.', status: 'READ', createdAt: new Date(Date.now() - 5 * 864e5).toISOString() },
+  { id: 3, firstName: 'John', lastName: 'Smith', email: 'john.smith@example.com', message: 'Looking for a partnership opportunity in Karakalpakstan.', status: 'NEW', createdAt: new Date(Date.now() - 1 * 864e5).toISOString() }
+];
 
-const uiText = {
-  welcome: { en: 'Welcome', ru: 'Добро пожаловать', uz: 'Xush kelibsiz', kaa: 'Qosh keldiniz' },
-  loadingContacts: { en: 'Loading contacts...', ru: 'Загрузка контактов...', uz: 'Bog‘lanishlar yuklanmoqda...', kaa: 'Baylanıslar júklenbekte...' },
-  loadingItems: { en: 'Loading items...', ru: 'Загрузка элементов...', uz: 'Elementlar yuklanmoqda...', kaa: 'Elementler júklenbekte...' },
-  loadingUsers: { en: 'Loading users...', ru: 'Загрузка пользователей...', uz: 'Foydalanuvchilar yuklanmoqda...', kaa: 'Paydalanıwshılar júklenbekte...' },
-  totalItems: { en: 'Total Items', ru: 'Всего элементов', uz: 'Jami elementlar', kaa: 'Jámi elementler' },
-  results: { en: 'Results', ru: 'Результаты', uz: 'Natijalar', kaa: 'Netijeler' },
-  achievements: { en: 'Achievements', ru: 'Достижения', uz: 'Yutuqlar', kaa: 'Jetiskenlikler' },
-  totalFeedback: { en: 'Total Feedback', ru: 'Всего отзывов', uz: 'Jami sharhlar', kaa: 'Jámi pikirler' },
-  totalPrograms: { en: 'Total Programs', ru: 'Всего программ', uz: 'Jami dasturlar', kaa: 'Jámi programmalar' },
-  courses: { en: 'Courses', ru: 'Курсы', uz: 'Kurslar', kaa: 'Kurslar' },
-  webinars: { en: 'Webinars', ru: 'Вебинары', uz: 'Vebinarlar', kaa: 'Vebinarlar' },
-  totalTemplates: { en: 'Total Templates', ru: 'Всего шаблонов', uz: 'Jami shablonlar', kaa: 'Jámi úlgiler' },
-  totalUsers: { en: 'Total Users', ru: 'Всего пользователей', uz: 'Jami foydalanuvchilar', kaa: 'Jámi paydalanıwshılar' },
-  edit: { en: 'Edit', ru: 'Редактировать', uz: 'Tahrirlash', kaa: 'Ózgertiw' },
-  delete: { en: 'Delete', ru: 'Удалить', uz: 'O‘chirish', kaa: 'Óshiriw' },
-  markRead: { en: 'Mark Read', ru: 'Отметить прочитанным', uz: 'O‘qilgan deb belgilash', kaa: 'Oqıldı dep belgilew' },
-  close: { en: 'Close', ru: 'Закрыть', uz: 'Yopish', kaa: 'Jabıw' },
-  result: { en: 'Result', ru: 'Результат', uz: 'Natija', kaa: 'Netije' },
-  achievement: { en: 'Achievement', ru: 'Достижение', uz: 'Yutuq', kaa: 'Jetiskenlik' },
-  course: { en: 'Course', ru: 'Курс', uz: 'Kurs', kaa: 'Kurs' },
-  webinar: { en: 'Webinar', ru: 'Вебинар', uz: 'Vebinar', kaa: 'Vebinar' },
-  link: { en: 'Link', ru: 'Ссылка', uz: 'Havola', kaa: 'Silteme' },
-  file: { en: 'File', ru: 'Файл', uz: 'Fayl', kaa: 'Fayl' },
-  uploadedFile: { en: 'Uploaded file', ru: 'Загруженный файл', uz: 'Yuklangan fayl', kaa: 'Júklengen fayl' },
-  visible: { en: 'Visible', ru: 'Видимый', uz: 'Ko‘rinadi', kaa: 'Kórinedi' },
-  hidden: { en: 'Hidden', ru: 'Скрыт', uz: 'Yashirilgan', kaa: 'Jasırılǵan' },
-  noContacts: { en: 'No contact messages found', ru: 'Контактные сообщения не найдены', uz: 'Bog‘lanish xabarlari topilmadi', kaa: 'Baylanıs xabarları tabılmadı' },
-  adjustFilters: { en: 'Try adjusting your filters.', ru: 'Попробуйте изменить фильтры.', uz: 'Filtrlarni o‘zgartirib ko‘ring.', kaa: 'Súzgishlerdi ózgertip kóriń.' },
-  noResults: { en: 'No results yet', ru: 'Пока нет результатов', uz: 'Hali natijalar yo‘q', kaa: 'Ele netijeler joq' },
-  addResultHint: { en: 'Use Add Item to create one.', ru: 'Используйте Добавить элемент.', uz: 'Element qo‘shish tugmasidan foydalaning.', kaa: 'Element qosıw túymesin paydalanıń.' },
-  noFeedback: { en: 'No feedback yet', ru: 'Пока нет отзывов', uz: 'Hali sharhlar yo‘q', kaa: 'Ele pikirler joq' },
-  addFeedbackHint: { en: 'Add client reviews from the Feedback tab.', ru: 'Добавьте отзывы во вкладке Отзывы.', uz: 'Sharhlarni Feedback bo‘limidan qo‘shing.', kaa: 'Pikirlerdi Feedback bóliminen qosıń.' },
-  noPrograms: { en: 'No programs yet', ru: 'Пока нет программ', uz: 'Hali dasturlar yo‘q', kaa: 'Ele programmalar joq' },
-  addProgramsHint: { en: 'Add courses or webinars from the Courses tab.', ru: 'Добавьте курсы или вебинары во вкладке Курсы.', uz: 'Kurslar bo‘limidan kurs yoki vebinar qo‘shing.', kaa: 'Kurslar bóliminen kurs yamasa vebinar qosıń.' },
-  noTemplates: { en: 'No templates yet', ru: 'Пока нет шаблонов', uz: 'Hali shablonlar yo‘q', kaa: 'Ele úlgiler joq' },
-  addTemplatesHint: { en: 'Add templates from the Templates tab.', ru: 'Добавьте шаблоны во вкладке Шаблоны.', uz: 'Shablonlar bo‘limidan shablon qo‘shing.', kaa: 'Úlgiler bóliminen úlgi qosıń.' },
-  noUsers: { en: 'No users yet', ru: 'Пока нет пользователей', uz: 'Hali foydalanuvchilar yo‘q', kaa: 'Ele paydalanıwshılar joq' },
-  usersHint: { en: 'Users appear here when they submit the contact form.', ru: 'Пользователи появятся здесь после отправки формы контакта.', uz: 'Foydalanuvchilar aloqa formasini yuborganda shu yerda ko‘rinadi.', kaa: 'Paydalanıwshılar baylanıs formasın jiberse, bul jerde kórinedi.' },
-  name: { en: 'Name', ru: 'Имя', uz: 'Ism', kaa: 'At' },
-  email: { en: 'Email', ru: 'Email', uz: 'Email', kaa: 'Email' },
-  messages: { en: 'Messages', ru: 'Сообщения', uz: 'Xabarlar', kaa: 'Xabarlar' },
-  lastContact: { en: 'Last Contact', ru: 'Последний контакт', uz: 'Oxirgi aloqa', kaa: 'Aqırǵı baylanıs' },
-  addNewItem: { en: 'Add New Item', ru: 'Добавить новый элемент', uz: 'Yangi element qo‘shish', kaa: 'Jańa element qosıw' },
-  editItem: { en: 'Edit Item', ru: 'Редактировать элемент', uz: 'Elementni tahrirlash', kaa: 'Elementti ózgertiw' },
-  saveItem: { en: 'Save Item', ru: 'Сохранить элемент', uz: 'Elementni saqlash', kaa: 'Elementni saqlaw' },
-  updateItem: { en: 'Update Item', ru: 'Обновить элемент', uz: 'Elementni yangilash', kaa: 'Elementti jańalaw' },
-  addFeedback: { en: 'Add Feedback', ru: 'Добавить отзыв', uz: 'Sharh qo‘shish', kaa: 'Pikir qosıw' },
-  editFeedback: { en: 'Edit Feedback', ru: 'Редактировать отзыв', uz: 'Sharhni tahrirlash', kaa: 'Pikirdi ózgertiw' },
-  saveFeedback: { en: 'Save Feedback', ru: 'Сохранить отзыв', uz: 'Sharhni saqlash', kaa: 'Pikirdi saqlaw' },
-  updateFeedback: { en: 'Update Feedback', ru: 'Обновить отзыв', uz: 'Sharhni yangilash', kaa: 'Pikirdi jańalaw' },
-  addProgram: { en: 'Add Learning Program', ru: 'Добавить учебную программу', uz: 'O‘quv dasturini qo‘shish', kaa: 'Oqıw programmasın qosıw' },
-  editProgram: { en: 'Edit Learning Program', ru: 'Редактировать учебную программу', uz: 'O‘quv dasturini tahrirlash', kaa: 'Oqıw programmasın ózgertiw' },
-  saveProgram: { en: 'Save Program', ru: 'Сохранить программу', uz: 'Dasturni saqlash', kaa: 'Programmanı saqlaw' },
-  updateProgram: { en: 'Update Program', ru: 'Обновить программу', uz: 'Dasturni yangilash', kaa: 'Programmanı jańalaw' },
-  addTemplate: { en: 'Add Template', ru: 'Добавить шаблон', uz: 'Shablon qo‘shish', kaa: 'Úlgi qosıw' },
-  editTemplate: { en: 'Edit Template', ru: 'Редактировать шаблон', uz: 'Shablonni tahrirlash', kaa: 'Úlgini ózgertiw' },
-  saveTemplate: { en: 'Save Template', ru: 'Сохранить шаблон', uz: 'Shablonni saqlash', kaa: 'Úlgini saqlaw' },
-  updateTemplate: { en: 'Update Template', ru: 'Обновить шаблон', uz: 'Shablonni yangilash', kaa: 'Úlgini jańalaw' },
-  deleteContactConfirm: { en: 'Delete this contact message?', ru: 'Удалить это контактное сообщение?', uz: 'Bu aloqa xabarini o‘chirish?', kaa: 'Bul baylanıs xabarın óshiriw kerek pe?' },
-  deleteItemConfirm: { en: 'Delete this item?', ru: 'Удалить этот элемент?', uz: 'Bu elementni o‘chirish?', kaa: 'Bul elementti óshiriw kerek pe?' },
-  deleteFeedbackConfirm: { en: 'Delete this feedback?', ru: 'Удалить этот отзыв?', uz: 'Bu sharhni o‘chirish?', kaa: 'Bul pikirdi óshiriw kerek pe?' },
-  deleteLearningConfirm: { en: 'Delete this learning item?', ru: 'Удалить этот учебный материал?', uz: 'Bu o‘quv materialini o‘chirish?', kaa: 'Bul oqıw materialın óshiriw kerek pe?' },
-  deleteTemplateConfirm: { en: 'Delete this template?', ru: 'Удалить этот шаблон?', uz: 'Bu shablonni o‘chirish?', kaa: 'Bul úlgini óshiriw kerek pe?' },
-  noContactsToExport: { en: 'No contacts to export.', ru: 'Нет контактов для экспорта.', uz: 'Eksport qilish uchun kontaktlar yo‘q.', kaa: 'Eksport etiw ushın baylanıslar joq.' },
-  failedUpdateStatus: { en: 'Failed to update status: ', ru: 'Не удалось обновить статус: ', uz: 'Statusni yangilab bo‘lmadi: ', kaa: 'Status jańalaw múmkin bolmadı: ' },
-  failedDelete: { en: 'Failed to delete: ', ru: 'Не удалось удалить: ', uz: 'O‘chirib bo‘lmadi: ', kaa: 'Óshiriw múmkin bolmadı: ' },
-  errorLoadingItems: { en: 'Error loading items', ru: 'Ошибка загрузки элементов', uz: 'Elementlarni yuklashda xatolik', kaa: 'Elementlerdi júklewde qátelik' },
-  fillTitleValue: { en: 'Please fill in both title and value.', ru: 'Пожалуйста, заполните название и значение.', uz: 'Iltimos, sarlavha va qiymatni to‘ldiring.', kaa: 'Iltimas, ataw hám qıymattı toltırıń.' },
-  fillFeedbackFields: { en: 'Please fill in all feedback fields.', ru: 'Пожалуйста, заполните все поля отзыва.', uz: 'Iltimos, sharhning barcha maydonlarini to‘ldiring.', kaa: 'Iltimas, pikir maydanlarınıń barlıǵın toltırıń.' },
-  fillLearningFields: { en: 'Please fill in title, format, and date.', ru: 'Пожалуйста, заполните название, формат и дату.', uz: 'Iltimos, sarlavha, format va sanani to‘ldiring.', kaa: 'Iltimas, ataw, format hám kúnin toltırıń.' },
-  fillTemplateFields: { en: 'Please fill in all required template fields.', ru: 'Пожалуйста, заполните все обязательные поля шаблона.', uz: 'Iltimos, shablonning barcha majburiy maydonlarini to‘ldiring.', kaa: 'Iltimas, úlginiń barlıq májbúriy maydanların toltırıń.' },
-  sectionNowVisible: { en: 'Section is now visible', ru: 'Раздел теперь виден', uz: 'Bo‘lim endi ko‘rinadi', kaa: 'Bólim endi kórinedi' },
-  sectionNowHidden: { en: 'Section is now hidden', ru: 'Раздел теперь скрыт', uz: 'Bo‘lim endi yashirildi', kaa: 'Bólim endi jasırıldı' }
-};
+/* ============================================================
+   MOCK API LAYER
+   Перехватываем window.fetch: любой /api/v1/... отдаём из памяти,
+   реального сетевого запроса не происходит. Всё остальное (шрифты
+   и т.п.) уходит в настоящий fetch.
+   ============================================================ */
+(function installMockApi() {
+  const realFetch = (typeof window.fetch === 'function') ? window.fetch.bind(window) : null;
 
-function t(key) {
-  return (uiText[key] && (uiText[key][currentLanguage] || uiText[key].en)) || key;
-}
+  function jsonResponse(data, status = 200) {
+    const body = JSON.stringify(data);
+    if (typeof Response === 'function') {
+      return Promise.resolve(new Response(body, {
+        status,
+        headers: { 'Content-Type': 'application/json' }
+      }));
+    }
+    // Фолбэк для очень старых браузеров
+    return Promise.resolve({
+      ok: status >= 200 && status < 300,
+      status,
+      json: () => Promise.resolve(data),
+      text: () => Promise.resolve(body)
+    });
+  }
 
+  window.fetch = function (input, init) {
+    const url = (typeof input === 'string') ? input : (input && input.url) || '';
+
+    if (url.indexOf('/api/v1/') !== -1) {
+      if (url.indexOf('/api/v1/templates') !== -1 && url.indexOf('/download') === -1) {
+        return jsonResponse(MOCK_TEMPLATES);
+      }
+      if (url.indexOf('/api/v1/admin/templates') !== -1) {
+        return jsonResponse(MOCK_TEMPLATES);
+      }
+      if (url.indexOf('/api/v1/admin/contacts') !== -1) {
+        return jsonResponse(MOCK_CONTACTS);
+      }
+      // contact POST, feedback, learning и любой другой api — успешный пустой ответ
+      return jsonResponse([], 200);
+    }
+
+    return realFetch ? realFetch(input, init) : jsonResponse({}, 200);
+  };
+})();
+
+/* ============================================================
+   ЯЗЫК (i18n) — переключение текста через data-* атрибуты
+   ============================================================ */
 function setLanguage(lang) {
-  currentLanguage = lang;
   localStorage.setItem('language', lang);
   document.documentElement.lang = lang;
 
-  const langToggle = document.getElementById('langToggle');
   const langNames = { en: 'English', ru: 'Русский', uz: "O'zbekcha", kaa: 'Қарақалпақша' };
-  if (langToggle) langToggle.textContent = langNames[lang];
+  const langToggle = document.getElementById('langToggle');
+  if (langToggle) langToggle.textContent = langNames[lang] || 'Language';
 
   const langMenu = document.getElementById('langMenu');
   if (langMenu) langMenu.classList.remove('active');
 
   document.querySelectorAll('[data-en]').forEach((el) => {
-    if (el.id === 'adminUser') return;
-    const attr = `data-${lang}`;
+    const attr = 'data-' + lang;
     if (!el.hasAttribute(attr)) return;
     const value = el.getAttribute(attr);
     if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-      const phAttr = `data-${lang}-placeholder`;
+      const phAttr = 'data-' + lang + '-placeholder';
       if (el.hasAttribute(phAttr)) el.placeholder = el.getAttribute(phAttr);
     } else {
       el.textContent = value;
     }
   });
-  setAdminWelcome();
-  refreshActiveTab();
+
+  // Перерисовать сетку шаблонов на главной в новом языке
+  renderHomeTemplates();
   window.dispatchEvent(new CustomEvent('languagechange', { detail: { language: lang } }));
 }
-
 window.setLanguage = setLanguage;
 
-function setAdminWelcome() {
-  const adminUser = localStorage.getItem('adminUser') || 'Admin';
-  const adminUserEl = document.getElementById('adminUser');
-  if (adminUserEl) adminUserEl.textContent = `${t('welcome')}, ${adminUser}`;
+/* ============================================================
+   МОБИЛЬНОЕ МЕНЮ (вызывается из onclick в HTML)
+   ============================================================ */
+function toggleMobileMenu() {
+  const nav = document.querySelector('.site-nav');
+  const btn = document.getElementById('mobileMenuBtn');
+  if (nav) nav.classList.toggle('mobile-open');
+  if (btn) btn.classList.toggle('open');
+}
+window.toggleMobileMenu = toggleMobileMenu;
+
+/* ============================================================
+   КРАСИВЫЕ ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ (toast)
+   ============================================================ */
+function ensureToastStyles() {
+  if (document.getElementById('mkToastStyles')) return;
+  const style = document.createElement('style');
+  style.id = 'mkToastStyles';
+  style.textContent = `
+    .mk-toast-wrap{position:fixed;top:1.25rem;right:1.25rem;z-index:99999;display:flex;flex-direction:column;gap:.6rem;max-width:360px}
+    .mk-toast{display:flex;align-items:flex-start;gap:.7rem;padding:1rem 1.1rem;border-radius:.75rem;
+      background:#ffffff;color:#0f172a;box-shadow:0 18px 48px rgba(2,12,40,.22);
+      border:1px solid #e6ebf5;border-left:4px solid #16a34a;font:500 .92rem/1.45 'Plus Jakarta Sans',system-ui,sans-serif;
+      transform:translateX(120%);opacity:0;transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s}
+    .mk-toast.show{transform:translateX(0);opacity:1}
+    .mk-toast.err{border-left-color:#dc2626}
+    .mk-toast.info{border-left-color:#0066ff}
+    .mk-toast-ico{flex:0 0 auto;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .mk-toast-msg{flex:1}
+    .mk-toast-title{font-weight:800;margin-bottom:.15rem}
+  `;
+  document.head.appendChild(style);
 }
 
-function refreshActiveTab() {
-  const active = document.querySelector('.nav-btn.active');
-  if (active) switchTab(active.dataset.tab);
+function showToast(message, type = 'success', title = '') {
+  ensureToastStyles();
+  let wrap = document.querySelector('.mk-toast-wrap');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.className = 'mk-toast-wrap';
+    document.body.appendChild(wrap);
+  }
+  const icons = { success: '✅', err: '⚠️', info: 'ℹ️' };
+  const toast = document.createElement('div');
+  toast.className = 'mk-toast ' + (type === 'success' ? '' : type);
+  toast.innerHTML =
+    '<span class="mk-toast-ico">' + (icons[type] || icons.success) + '</span>' +
+    '<span class="mk-toast-msg">' +
+    (title ? '<span class="mk-toast-title">' + escapeHtml(title) + '</span>' : '') +
+    escapeHtml(message) + '</span>';
+  wrap.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 400);
+  }, 3800);
+}
+window.showToast = showToast;
+
+/* ============================================================
+   СЕТКА ШАБЛОНОВ НА ГЛАВНОЙ (#templatesGrid)
+   ============================================================ */
+function localText(obj) {
+  if (!obj) return '';
+  if (typeof obj === 'string') return obj;
+  const lang = getLang();
+  return obj[lang] || obj.ru || obj.uz || obj.en || '';
 }
 
-let allContacts = [];
-let contactFilters = { search: '', from: '', to: '', sort: 'date_desc' };
+function renderHomeTemplates() {
+  const grid = document.getElementById('templatesGrid');
+  if (!grid) return;
 
-async function loadContacts() {
-  const list = document.getElementById('contactsList');
-  if (list) list.innerHTML = `<div class="loading">${t('loadingContacts')}</div>`;
+  const lang = getLang();
+  const viewLabel = { ru: 'Подробнее', en: 'View', uz: 'Batafsil', kaa: 'Tolıǵıraq' }[lang] || 'Подробнее';
 
-  try {
-    if (false) { // local-auth removed
-      allContacts = getStoredItems('siteContacts');
-      const filtered = filterContacts(allContacts);
-      displayContactSummary(filtered, allContacts);
-      displayContacts(filtered);
+  grid.innerHTML = MOCK_TEMPLATES.map((tpl) => {
+    const title = escapeHtml(localText(tpl.title));
+    const desc = escapeHtml(localText(tpl.description));
+    const img = escapeHtml(tpl.imageUrl || '');
+    const badge = escapeHtml(tpl.badge || 'DOC');
+    return (
+      '<article class="template-card reveal">' +
+        '<div class="template-preview">' +
+          (img
+            ? '<img class="template-image" src="' + img + '" alt="' + title + '" loading="lazy" onerror="this.style.display=\'none\'">'
+            : '') +
+          '<span class="template-badge">' + badge + '</span>' +
+        '</div>' +
+        '<div class="template-card-content">' +
+          '<h3>' + title + '</h3>' +
+          '<p>' + desc + '</p>' +
+          '<a class="button button-secondary" href="templates.html" ' +
+             'style="margin-top:auto;align-self:flex-start;font-size:.875rem;padding:.55rem 1.25rem">' +
+             viewLabel + ' →</a>' +
+        '</div>' +
+      '</article>'
+    );
+  }).join('');
+}
+
+/* ============================================================
+   ФОРМА КОНТАКТА на главной (#contactForm)
+   ============================================================ */
+function wireContactForm() {
+  const form = document.getElementById('contactForm');
+  if (!form) return;
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const get = (id) => {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : '';
+    };
+    const firstName = get('firstName');
+    const lastName = get('lastName');
+    const email = get('email');
+    const message = get('message');
+
+    if (!firstName || !email) {
+      showToast(
+        { ru: 'Пожалуйста, заполните имя и email.', en: 'Please fill in your name and email.', uz: 'Iltimos, ism va emailni to‘ldiring.', kaa: 'Iltimas, at hám email toltırıń.' }[getLang()] || 'Заполните имя и email.',
+        'err'
+      );
       return;
     }
 
-    const res = await fetch(`${API_BASE}/api/v1/admin/contacts`, {
-      headers: authHeaders()
+    // Сохраняем заявку в памяти сессии
+    MOCK_CONTACTS.unshift({
+      id: Date.now(),
+      firstName, lastName, email, message,
+      status: 'NEW',
+      createdAt: new Date().toISOString()
     });
 
-    if (handleAuthError(res)) return;
-    if (!res.ok) throw new Error(`Server error: ${res.status}`);
-
-    allContacts = await res.json();
-    const filtered = filterContacts(allContacts);
-    displayContactSummary(filtered, allContacts);
-    displayContacts(filtered);
-  } catch (err) {
-    console.error('loadContacts error:', err);
-    allContacts = getStoredItems('siteContacts');
-    const filtered = filterContacts(allContacts);
-    displayContactSummary(filtered, allContacts);
-    displayContacts(filtered);
-  }
-}
-
-function filterContacts(contacts) {
-  let filtered = contacts.slice();
-
-  if (contactFilters.search) {
-    const q = contactFilters.search.toLowerCase();
-    filtered = filtered.filter(c =>
-      `${c.firstName} ${c.lastName} ${c.email} ${c.message}`.toLowerCase().includes(q)
+    form.reset();
+    showToast(
+      { ru: 'Заявка отправлена! Мы свяжемся с вами в ближайшее время.', en: 'Your message has been sent! We will contact you soon.', uz: 'So‘rovingiz yuborildi! Tez orada bog‘lanamiz.', kaa: 'Sorawıńız jiberildi! Tez arada baylanısamız.' }[getLang()] || 'Заявка отправлена!',
+      'success',
+      { ru: 'Спасибо!', en: 'Thank you!', uz: 'Rahmat!', kaa: 'Rahmet!' }[getLang()] || 'Спасибо!'
     );
-  }
-  if (contactFilters.from) {
-    const from = new Date(contactFilters.from);
-    filtered = filtered.filter(c => new Date(c.createdAt) >= from);
-  }
-  if (contactFilters.to) {
-    const to = new Date(contactFilters.to);
-    to.setHours(23, 59, 59, 999);
-    filtered = filtered.filter(c => new Date(c.createdAt) <= to);
-  }
-
-  return filtered.sort((a, b) => {
-    if (contactFilters.sort === 'date_asc') return new Date(a.createdAt) - new Date(b.createdAt);
-    if (contactFilters.sort === 'date_desc') return new Date(b.createdAt) - new Date(a.createdAt);
-    const na = `${a.firstName} ${a.lastName}`.toLowerCase();
-    const nb = `${b.firstName} ${b.lastName}`.toLowerCase();
-    return contactFilters.sort === 'name_asc' ? na.localeCompare(nb) : nb.localeCompare(na);
   });
 }
 
-function displayContactSummary(filtered, all) {
-  const tc = document.getElementById('totalContacts');
-  const us = document.getElementById('uniqueSenders');
-  const rc = document.getElementById('recentContacts');
-  const lc = document.getElementById('latestContact');
+/* ============================================================
+   КНОПКА «НАВЕРХ» (#fab) + тень шапки при скролле
+   ============================================================ */
+function wireScrollUi() {
+  const fab = document.getElementById('fab');
+  const header = document.querySelector('.site-header');
 
-  if (tc) tc.textContent = all.length;
-  if (us) us.textContent = new Set(all.map(c => c.email)).size;
-  if (rc) rc.textContent = all.filter(c => {
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 7);
-    return new Date(c.createdAt) >= cutoff;
-  }).length;
-  
-  const latest = all.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
-  if (lc) lc.textContent = latest ? new Date(latest.createdAt).toLocaleDateString() : '—';
+  const onScroll = () => {
+    const y = window.scrollY || window.pageYOffset || 0;
+    if (header) header.classList.toggle('scrolled', y > 10);
+    if (fab) fab.classList.toggle('fab-visible', y > 400);
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  if (fab) {
+    fab.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  }
 }
 
-function displayContacts(contacts) {
-  const list = document.getElementById('contactsList');
-  if (!list) return;
+/* ============================================================
+   ЯЗЫКОВОЕ МЕНЮ (открытие/выбор)
+   ============================================================ */
+function wireLanguageMenu() {
+  const toggle = document.getElementById('langToggle');
+  const menu = document.getElementById('langMenu');
 
-  if (!contacts.length) {
-    list.innerHTML = `<div class="empty-state"><h3>${t('noContacts')}</h3><p>${t('adjustFilters')}</p></div>`;
-    return;
-  }
-
-  const ALLOWED_STATUSES = new Set(['NEW', 'READ', 'CLOSED']);
-  list.innerHTML = contacts.map(c => {
-    const safeId  = parseInt(c.id, 10);
-    const safeStatus = ALLOWED_STATUSES.has(c.status) ? c.status : 'NEW';
-    return `
-    <div class="contact-card list-card">
-      <div class="contact-header">
-        <div>
-          <div class="contact-name">${escapeHtml(c.firstName)} ${escapeHtml(c.lastName)}</div>
-          <div class="contact-email">${escapeHtml(c.email)}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap">
-          <span class="status-badge status-${safeStatus}">${escapeHtml(safeStatus)}</span>
-          <span class="timestamp">${new Date(c.createdAt).toLocaleString()}</span>
-        </div>
-      </div>
-      <p class="contact-message">${escapeHtml(c.message)}</p>
-      <div class="contact-footer">
-        <button onclick="updateContactStatus(${safeId},'READ')" class="soft-btn">${t('markRead')}</button>
-        <button onclick="updateContactStatus(${safeId},'CLOSED')" class="soft-btn">${t('close')}</button>
-        <button onclick="deleteContact(${safeId})" class="soft-btn" style="color:var(--danger);border-color:var(--danger)">${t('delete')}</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function updateContactStatus(id, status) {
-  if (false) { // local-auth removed
-    const contacts = getStoredItems('siteContacts');
-    const idx = contacts.findIndex(c => c.id === id);
-    if (idx !== -1) contacts[idx] = { ...contacts[idx], status };
-    localStorage.setItem('siteContacts', JSON.stringify(contacts));
-    await loadContacts();
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API_BASE}/api/v1/admin/contacts/${id}/status`, {
-      method: 'PUT',
-      headers: authHeaders(),
-      body: JSON.stringify({ status })
+  if (toggle && menu) {
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.classList.toggle('active');
     });
-    if (handleAuthError(res)) return;
-    if (!res.ok) throw new Error(`Server error: ${res.status}`);
-    await loadContacts();
-  } catch (err) {
-    alert(t('failedUpdateStatus') + err.message);
-  }
-}
-
-async function deleteContact(id) {
-  if (!confirm(t('deleteContactConfirm'))) return;
-  if (false) { // local-auth removed
-    const contacts = getStoredItems('siteContacts').filter(c => c.id !== id);
-    localStorage.setItem('siteContacts', JSON.stringify(contacts));
-    await loadContacts();
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API_BASE}/api/v1/admin/contacts/${id}`, {
-      method: 'DELETE',
-      headers: authHeaders()
+    document.addEventListener('click', (e) => {
+      if (!menu.contains(e.target) && e.target !== toggle) menu.classList.remove('active');
     });
-    if (handleAuthError(res)) return;
-    if (!res.ok) throw new Error(`Server error: ${res.status}`);
-    await loadContacts();
-  } catch (err) {
-    alert(t('failedDelete') + err.message);
-  }
-}
-
-function updateContactFilters() {
-  contactFilters.search = document.getElementById('contactSearch').value.trim().toLowerCase();
-  contactFilters.from = document.getElementById('contactFromDate').value;
-  contactFilters.to = document.getElementById('contactToDate').value;
-  contactFilters.sort = document.getElementById('contactSort').value;
-  const filtered = filterContacts(allContacts);
-  displayContactSummary(filtered, allContacts);
-  displayContacts(filtered);
-}
-
-function clearContactFilters() {
-  document.getElementById('contactSearch').value = '';
-  document.getElementById('contactFromDate').value = '';
-  document.getElementById('contactToDate').value = '';
-  document.getElementById('contactSort').value = 'date_desc';
-  contactFilters = { search: '', from: '', to: '', sort: 'date_desc' };
-  updateContactFilters();
-}
-
-function exportContactsToCSV() {
-  const filtered = filterContacts(allContacts);
-  if (!filtered.length) { alert(t('noContactsToExport')); return; }
-
-  const headers = ['First Name', 'Last Name', 'Email', 'Message', 'Status', 'Date'];
-  const rows = filtered.map(c => [
-    `"${c.firstName}"`, `"${c.lastName}"`, `"${c.email}"`,
-    `"${(c.message || '').replace(/"/g, '""')}"`,
-    `"${c.status || ''}"`,
-    `"${new Date(c.createdAt).toLocaleString()}"`
-  ].join(','));
-
-  const csv = [headers.join(','), ...rows].join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.setAttribute('download', `contacts_${new Date().toISOString().split('T')[0]}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-function getStoredItems(key) {
-  try {
-    return JSON.parse(localStorage.getItem(key) || '[]');
-  } catch (err) {
-    return [];
-  }
-}
-
-function readUploadedFile(inputId) {
-  const input = document.getElementById(inputId);
-  const file = input && input.files ? input.files[0] : null;
-  if (!file) return Promise.resolve(null);
-
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve({ name: file.name, type: file.type, data: reader.result });
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-}
-
-function loadResults() {
-  const list = document.getElementById('resultsList');
-  if (list) list.innerHTML = `<div class="loading">${t('loadingItems')}</div>`;
-
-  try {
-    const results = JSON.parse(localStorage.getItem('siteResults') || '[]');
-    displayResultsSummary(results);
-    displayResults(results);
-  } catch (err) {
-    if (list) list.innerHTML = `<div class="empty-state"><h3>${t('errorLoadingItems')}</h3></div>`;
-  }
-}
-
-function displayResultsSummary(results) {
-  const area = document.getElementById('resultsSummary');
-  if (!area) return;
-  area.innerHTML = `
-    <div class="summary-card small"><span class="summary-label">${t('totalItems')}</span><strong>${results.length}</strong></div>
-    <div class="summary-card small"><span class="summary-label">${t('results')}</span><strong>${results.filter(i => i.type === 'result').length}</strong></div>
-    <div class="summary-card small"><span class="summary-label">${t('achievements')}</span><strong>${results.filter(i => i.type === 'achievement').length}</strong></div>
-  `;
-}
-
-function displayResults(results) {
-  const list = document.getElementById('resultsList');
-  if (!list) return;
-
-  if (!results.length) {
-    list.innerHTML = `<div class="empty-state"><h3>${t('noResults')}</h3><p>${t('addResultHint')}</p></div>`;
-    return;
   }
 
-  list.innerHTML = results.map(item => {
-    const safeId = parseInt(item.id, 10);
-    return `
-    <div class="result-card list-card">
-      <div>
-        <div class="result-type-badge">${escapeHtml(item.type === 'achievement' ? t('achievement') : t('result'))}</div>
-        <div class="result-title">${escapeHtml(item.title)}</div>
-        <div class="result-value">${escapeHtml(item.value)}</div>
-        ${item.description ? `<div class="result-description">${escapeHtml(item.description)}</div>` : ''}
-      </div>
-      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;flex-shrink:0">
-        <button class="soft-btn" onclick="editItem(${safeId})">${t('edit')}</button>
-        <button class="soft-btn" onclick="deleteItem(${safeId})" style="color:var(--danger);border-color:var(--danger)">${t('delete')}</button>
-      </div>
-    </div>
-  `}).join('');
-}
-
-function openAddItemModal() {
-  editingItemId = null;
-  document.getElementById('addResultForm').reset();
-  document.querySelector('#addResultModal .save-btn').textContent = t('saveItem');
-  document.querySelector('#addResultModal .modal-header h3').textContent = t('addNewItem');
-  document.getElementById('addResultModal').classList.add('active');
-}
-
-function closeModalWindow() {
-  document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('active'));
-}
-
-function handleResultFormSubmit(e) {
-  e.preventDefault();
-  const title = document.getElementById('resultTitle').value.trim();
-  const value = document.getElementById('resultValue').value.trim();
-  const description = document.getElementById('resultDescription').value.trim();
-  const type = document.getElementById('itemType').value;
-
-  if (!title || !value) { alert(t('fillTitleValue')); return; }
-
-  const results = JSON.parse(localStorage.getItem('siteResults') || '[]');
-  if (editingItemId !== null) {
-    const idx = results.findIndex(i => i.id === editingItemId);
-    if (idx !== -1) results[idx] = { ...results[idx], title, value, description, type };
-  } else {
-    results.push({ id: Date.now(), title, value, description, type, createdAt: new Date().toISOString() });
-  }
-  localStorage.setItem('siteResults', JSON.stringify(results));
-  closeModalWindow();
-  loadResults();
-}
-
-function editItem(itemId) {
-  const results = JSON.parse(localStorage.getItem('siteResults') || '[]');
-  const item = results.find(r => r.id === itemId);
-  if (!item) return;
-  editingItemId = itemId;
-  document.getElementById('itemType').value = item.type || 'result';
-  document.getElementById('resultTitle').value = item.title;
-  document.getElementById('resultValue').value = item.value;
-  document.getElementById('resultDescription').value = item.description || '';
-  document.querySelector('#addResultModal .save-btn').textContent = t('updateItem');
-  document.querySelector('#addResultModal .modal-header h3').textContent = t('editItem');
-  document.getElementById('addResultModal').classList.add('active');
-}
-
-function deleteItem(itemId) {
-  if (!confirm(t('deleteItemConfirm'))) return;
-  const results = JSON.parse(localStorage.getItem('siteResults') || '[]');
-  localStorage.setItem('siteResults', JSON.stringify(results.filter(i => i.id !== itemId)));
-  loadResults();
-}
-
-// ============================================================
-// FEEDBACKS — Admin panel, uses backend API with JWT
-// ============================================================
-async function loadFeedbacks() {
-  const list = document.getElementById('feedbackList');
-  const summary = document.getElementById('feedbackSummary');
-  if (list) list.innerHTML = `<div class="loading">${t('loadingItems')}</div>`;
-
-  try {
-    const res = await fetch(`${API_BASE}/api/v1/admin/feedbacks`, {
-      headers: authHeaders()
-    });
-    if (handleAuthError(res)) return;
-    if (!res.ok) throw new Error(`Server error: ${res.status}`);
-
-    const feedbacks = await res.json();
-    renderFeedbackList(feedbacks, list, summary);
-  } catch (err) {
-    console.error('loadFeedbacks error:', err);
-    if (list) list.innerHTML = `<div class="empty-state"><h3>${t('errorLoadingItems')}</h3></div>`;
-  }
-}
-
-function renderFeedbackList(feedbacks, list, summary) {
-  if (summary) {
-    summary.innerHTML = `
-      <div class="summary-card small"><span class="summary-label">${t('totalFeedback')}</span><strong>${feedbacks.length}</strong></div>
-    `;
-  }
-
-  if (!list) return;
-
-  if (!feedbacks.length) {
-    list.innerHTML = `<div class="empty-state"><h3>${t('noFeedback')}</h3><p>${t('addFeedbackHint')}</p></div>`;
-    return;
-  }
-
-  list.innerHTML = feedbacks.map(item => {
-    const safeId = parseInt(item.id, 10);
-    return `
-    <div class="feedback-card list-card">
-      <div>
-        <div class="feedback-author">${escapeHtml(item.name)}</div>
-        <div class="feedback-meta">${escapeHtml(item.role || '')} — ${escapeHtml(item.organization || '')}</div>
-        <div class="feedback-text">${escapeHtml(item.message)}</div>
-        ${item.rating ? `<div class="feedback-meta">⭐ ${parseInt(item.rating, 10)}/5</div>` : ''}
-        <div class="feedback-meta" style="font-size:0.75rem;color:var(--muted)">${item.published ? '✅ Published' : '🔒 Hidden'}</div>
-      </div>
-      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;flex-shrink:0">
-        <button class="soft-btn" onclick="editFeedback(${safeId})">${t('edit')}</button>
-        <button class="soft-btn" onclick="deleteFeedback(${safeId})" style="color:var(--danger);border-color:var(--danger)">${t('delete')}</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function openAddFeedbackModal() {
-  editingFeedbackId = null;
-  document.getElementById('addFeedbackForm').reset();
-  document.querySelector('#addFeedbackModal .save-btn').textContent = t('saveFeedback');
-  document.querySelector('#addFeedbackModal .modal-header h3').textContent = t('addFeedback');
-  document.getElementById('addFeedbackModal').classList.add('active');
-}
-
-async function handleFeedbackFormSubmit(e) {
-  e.preventDefault();
-  const name = document.getElementById('feedbackName').value.trim();
-  const role = document.getElementById('feedbackRole').value.trim();
-  const organization = document.getElementById('feedbackOrg').value.trim();
-  const message = document.getElementById('feedbackMessage').value.trim();
-
-  if (!name || !message) {
-    alert(t('fillFeedbackFields'));
-    return;
-  }
-
-  const payload = { name, role, organization, message, published: true };
-
-  try {
-    let res;
-    if (editingFeedbackId !== null) {
-      res = await fetch(`${API_BASE}/api/v1/admin/feedbacks/${editingFeedbackId}`, {
-        method: 'PUT',
-        headers: authHeaders(),
-        body: JSON.stringify(payload)
-      });
-    } else {
-      res = await fetch(`${API_BASE}/api/v1/admin/feedbacks`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(payload)
-      });
-    }
-    if (handleAuthError(res)) return;
-    if (!res.ok) throw new Error(`Server error: ${res.status}`);
-    closeModalWindow();
-    await loadFeedbacks();
-  } catch (err) {
-    alert(t('failedDelete') + err.message);
-  }
-}
-
-async function editFeedback(itemId) {
-  try {
-    const res = await fetch(`${API_BASE}/api/v1/admin/feedbacks`, { headers: authHeaders() });
-    if (!res.ok) throw new Error();
-    const feedbacks = await res.json();
-    const item = feedbacks.find(f => f.id === itemId);
-    if (!item) return;
-    editingFeedbackId = itemId;
-    document.getElementById('feedbackName').value = item.name;
-    document.getElementById('feedbackRole').value = item.role || '';
-    document.getElementById('feedbackOrg').value = item.organization || '';
-    document.getElementById('feedbackMessage').value = item.message;
-    document.querySelector('#addFeedbackModal .save-btn').textContent = t('updateFeedback');
-    document.querySelector('#addFeedbackModal .modal-header h3').textContent = t('editFeedback');
-    document.getElementById('addFeedbackModal').classList.add('active');
-  } catch (err) {
-    alert({en:'Could not load feedback for editing',ru:'Не удалось загрузить отзыв для редактирования',uz:'Tahrirlash uchun fikrni yuklashning imkoni yo\'lmadi',kaa:'Redaktorlaw ushın pikirdi júklew múmkin bolmadı'}[localStorage.getItem('language')||'ru']);
-  }
-}
-
-async function deleteFeedback(itemId) {
-  if (!confirm(t('deleteFeedbackConfirm'))) return;
-  try {
-    const res = await fetch(`${API_BASE}/api/v1/admin/feedbacks/${itemId}`, {
-      method: 'DELETE',
-      headers: authHeaders()
-    });
-    if (handleAuthError(res)) return;
-    if (!res.ok) throw new Error(`Server error: ${res.status}`);
-    await loadFeedbacks();
-  } catch (err) {
-    alert(t('failedDelete') + err.message);
-  }
-}
-
-// ============================================================
-// LEARNING — Admin panel, uses backend API with JWT
-// ============================================================
-async function loadLearning() {
-  const list = document.getElementById('learningList');
-  const summary = document.getElementById('learningSummary');
-  if (list) list.innerHTML = `<div class="loading">${t('loadingItems')}</div>`;
-
-  try {
-    const res = await fetch(`${API_BASE}/api/v1/admin/learning`, {
-      headers: authHeaders()
-    });
-    if (handleAuthError(res)) return;
-    if (!res.ok) throw new Error(`Server error: ${res.status}`);
-
-    const programs = await res.json();
-    renderLearningList(programs, list, summary);
-  } catch (err) {
-    console.error('loadLearning error:', err);
-    if (list) list.innerHTML = `<div class="empty-state"><h3>${t('errorLoadingItems')}</h3></div>`;
-  }
-}
-
-function renderLearningList(programs, list, summary) {
-  if (summary) {
-    summary.innerHTML = `
-      <div class="summary-card small"><span class="summary-label">${t('totalPrograms')}</span><strong>${programs.length}</strong></div>
-      <div class="summary-card small"><span class="summary-label">${t('courses')}</span><strong>${programs.filter(item => item.format === 'course').length}</strong></div>
-      <div class="summary-card small"><span class="summary-label">${t('webinars')}</span><strong>${programs.filter(item => item.format === 'webinar').length}</strong></div>
-    `;
-  }
-
-  if (!list) return;
-
-  if (!programs.length) {
-    list.innerHTML = `<div class="empty-state"><h3>${t('noPrograms')}</h3><p>${t('addProgramsHint')}</p></div>`;
-    return;
-  }
-
-  list.innerHTML = programs.map(item => {
-    const safeId = parseInt(item.id, 10);
-    return `
-    <div class="learning-card list-card">
-      <div>
-        <div class="learning-format-badge">${escapeHtml(item.format === 'course' ? t('course') : t('webinar'))}</div>
-        <div class="learning-title">${escapeHtml(item.title)}</div>
-        ${item.description ? `<div class="learning-description">${escapeHtml(item.description)}</div>` : ''}
-      </div>
-      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;flex-shrink:0">
-        <button class="soft-btn" onclick="editLearning(${safeId})">${t('edit')}</button>
-        <button class="soft-btn" onclick="deleteLearning(${safeId})" style="color:var(--danger);border-color:var(--danger)">${t('delete')}</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function editLearning(id) {
-  console.log("Редактирование элемента обучения с id:", id);
-}
-
-function deleteLearning(id) {
-  console.log("Удаление элемента обучения с id:", id);
-}
-
-// ============================================================
-// ТАБЫ И НАВИГАЦИЯ (SWITCH TAB)
-// ============================================================
-function switchTab(tabId) {
-  // 1. Переключаем активный класс у кнопок навигации
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    if (btn.dataset.tab === tabId) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
-  });
-
-  // 2. Переключаем отображение контента вкладок
-  document.querySelectorAll('.tab-content').forEach(content => {
-    if (content.id === `${tabId}Tab` || content.id === tabId) {
-      content.style.display = 'block';
-    } else {
-      content.style.display = 'none';
-    }
-  });
-
-  // 3. Вызываем функцию загрузки данных под каждую вкладку
-  if (tabId === 'contacts') loadContacts();
-  if (tabId === 'results') loadResults();
-  if (tabId === 'feedback') loadFeedbacks();
-  if (tabId === 'learning') loadLearning();
-}
-
-window.switchTab = switchTab;
-
-// Навешивание обработчиков событий и инициализация страницы при полной загрузке DOM
-document.addEventListener('DOMContentLoaded', () => {
-  // Навешиваем обработку кликов на все кнопки меню динамически
-  document.querySelectorAll('.nav-btn').forEach(btn => {
+  document.querySelectorAll('.lang-option').forEach((btn) => {
     btn.addEventListener('click', () => {
-      if (btn.dataset.tab) {
-        switchTab(btn.dataset.tab);
-      }
+      const lang = btn.getAttribute('data-lang');
+      if (lang) setLanguage(lang);
     });
   });
+}
 
-  // Запуск стартового экрана
-  const initialActiveBtn = document.querySelector('.nav-btn.active');
-  if (initialActiveBtn && initialActiveBtn.dataset.tab) {
-    switchTab(initialActiveBtn.dataset.tab);
-  } else {
-    // Дефолтная вкладка по умолчанию
-    switchTab('contacts');
-  }
+/* ============================================================
+   ИНИЦИАЛИЗАЦИЯ
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  wireLanguageMenu();
+  wireScrollUi();
+  wireContactForm();
+  renderHomeTemplates();
 
-  setAdminWelcome();
+  // Применяем сохранённый язык (по умолчанию RU)
+  setLanguage(getLang());
+
+  // Закрывать мобильное меню при клике по ссылке навигации
+  document.querySelectorAll('.site-nav .nav-link').forEach((link) => {
+    link.addEventListener('click', () => {
+      const nav = document.querySelector('.site-nav');
+      const btn = document.getElementById('mobileMenuBtn');
+      if (nav) nav.classList.remove('mobile-open');
+      if (btn) btn.classList.remove('open');
+    });
+  });
 });

@@ -1,38 +1,51 @@
 name: Deploy to GitHub Pages
 
+# Запускается при пуше в main или master, а также вручную из вкладки Actions.
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [ main, master ]
+  workflow_dispatch:
 
+# Права, необходимые для публикации на GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Не отменять уже идущий деплой, выполнять по очереди
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  # ── Сборка статического сайта ──────────────────────────────
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload artifact
+      # Отключаем обработку Jekyll, чтобы все файлы публиковались как есть
+      - name: Disable Jekyll processing
+        run: touch .nojekyll
+
+      - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
+          # Сайт лежит в корне репозитория (index.html, *.js, *.css, images/, logos/)
           path: '.'
 
+  # ── Публикация на GitHub Pages ─────────────────────────────
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
