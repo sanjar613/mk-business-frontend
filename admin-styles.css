@@ -242,3 +242,142 @@ td.td-date{color:var(--text-light);font-size:0.82rem}
   .tab-actions{flex-direction:column;width:100%}
   .action-btn{justify-content:center}
 }
+
+/* ============================================================
+   DASHBOARD (Панель управления) — премиум CRM-стиль
+   ============================================================ */
+#dashboard-section { animation: dashFade 0.5s ease both; }
+@keyframes dashFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.dash-period {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.5rem 1rem; border-radius: 999px;
+  background: var(--accent-soft); color: var(--accent);
+  font-size: 0.8rem; font-weight: 700; border: 1px solid var(--accent-glow);
+}
+
+/* ── KPI карточки ───────────────────────────────────────── */
+.dash-kpi-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem; margin-bottom: 1.5rem;
+}
+.dash-kpi {
+  position: relative; overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.3s, transform 0.3s, border-color 0.3s;
+}
+.dash-kpi::after {
+  content: ''; position: absolute; right: -30px; top: -30px;
+  width: 110px; height: 110px; border-radius: 50%;
+  background: var(--accent-soft); opacity: 0.5; pointer-events: none;
+}
+.dash-kpi:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); border-color: var(--accent-glow); }
+.dash-kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; position: relative; z-index: 1; }
+.dash-kpi-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; box-shadow: var(--shadow-sm);
+}
+.dash-kpi-icon svg { width: 24px; height: 24px; }
+.icon-blue   { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+.icon-violet { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+.icon-cyan   { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+.icon-green  { background: linear-gradient(135deg, #10b981, #059669); }
+
+.dash-trend {
+  font-size: 0.75rem; font-weight: 700; padding: 0.3rem 0.6rem;
+  border-radius: 999px; white-space: nowrap;
+}
+.dash-trend.up   { color: var(--success); background: var(--success-soft); }
+.dash-trend.flat { color: var(--info);    background: var(--info-soft); }
+
+.dash-kpi-value {
+  font-size: 2.1rem; font-weight: 800; letter-spacing: -0.03em;
+  color: var(--text); line-height: 1.05; position: relative; z-index: 1;
+}
+.dash-kpi-label { margin-top: 0.4rem; font-size: 0.875rem; color: var(--text-light); font-weight: 600; }
+.dash-kpi-foot { margin-top: 0.65rem; font-size: 0.78rem; font-weight: 700; }
+.dash-kpi-foot.up   { color: var(--success); }
+.dash-kpi-foot.flat { color: var(--info); }
+
+/* ── Сетка «график + активность» ────────────────────────── */
+.dash-grid-2 {
+  display: grid; grid-template-columns: 1.6fr 1fr;
+  gap: 1.25rem; align-items: stretch;
+}
+.dash-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.5rem 1.75rem;
+  box-shadow: var(--shadow-sm);
+}
+.dash-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+.dash-card-head h3 { font-size: 1.05rem; font-weight: 800; color: var(--text); }
+.dash-legend {
+  font-size: 0.75rem; font-weight: 700; color: var(--accent);
+  background: var(--accent-soft); padding: 0.3rem 0.7rem; border-radius: 999px;
+}
+
+/* ── Имитация столбчатого графика ───────────────────────── */
+.dash-bars {
+  position: relative; display: flex; gap: 0.75rem;
+  align-items: flex-end; height: 260px; padding: 0; box-sizing: border-box;
+}
+.dash-bar-col {
+  position: relative; flex: 1; height: 100%; box-sizing: border-box;
+  padding: 28px 0 26px;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.dash-bar {
+  width: 64%; max-width: 48px; height: var(--h); min-height: 8px;
+  border-radius: 10px 10px 5px 5px;
+  background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
+  transform-origin: bottom; animation: growBar 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
+  transition: filter 0.25s;
+}
+.dash-bar.tallest { background: linear-gradient(180deg, #34d399 0%, #059669 100%); box-shadow: 0 6px 14px rgba(5, 150, 105, 0.3); }
+.dash-bar-col:hover .dash-bar { filter: brightness(1.08) saturate(1.1); }
+.dash-bar-val {
+  position: absolute; top: 4px; left: 0; right: 0; text-align: center;
+  font-size: 0.72rem; font-weight: 800; color: var(--text-secondary);
+}
+.dash-bar-label {
+  position: absolute; bottom: 4px; left: 0; right: 0; text-align: center;
+  font-size: 0.72rem; font-weight: 600; color: var(--muted);
+}
+@keyframes growBar { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+/* ── Последняя активность ───────────────────────────────── */
+.dash-activity { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.dash-act {
+  display: flex; align-items: center; gap: 0.85rem;
+  padding: 0.85rem 0; border-bottom: 1px solid var(--border-soft);
+}
+.dash-act:last-child { border-bottom: none; }
+.dash-act-dot { flex: 0 0 auto; width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 0 4px var(--surface-hover); }
+.dash-act-dot.success { background: var(--success); }
+.dash-act-dot.warning { background: var(--warning); }
+.dash-act-body { flex: 1; display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.dash-act-title { font-size: 0.875rem; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-act-time { font-size: 0.75rem; color: var(--muted); }
+.dash-status {
+  flex: 0 0 auto; font-size: 0.7rem; font-weight: 700;
+  padding: 0.3rem 0.65rem; border-radius: 999px; white-space: nowrap;
+}
+.dash-status.success    { color: var(--success); background: var(--success-soft); }
+.dash-status.processing { color: var(--warning); background: var(--warning-soft); }
+
+/* ── Адаптив ─────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .dash-grid-2 { grid-template-columns: 1fr; }
+  .dash-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .dash-kpi-grid { grid-template-columns: 1fr; }
+  .dash-bars { height: 200px; }
+  .dash-kpi-value { font-size: 1.8rem; }
+}

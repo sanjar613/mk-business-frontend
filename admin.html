@@ -24,7 +24,7 @@
     <header class="admin-header">
       <a href="index.html" class="brand brand-link">
         <img class="brand-logo-img" src="logos/10.png" alt="MK Business Logo" />
-        <span class="brand-name">MK Business Corp Sanjar emes</span>
+        <span class="brand-name">MK Business Corp Sanjar</span>
       </a>
       <div class="admin-controls">
         <div class="language-dropdown">
@@ -42,7 +42,8 @@
     </header>
 
     <nav class="admin-nav">
-      <button class="nav-btn active" data-tab="contacts" data-en="Contacts" data-ru="Контакты" data-uz="Kontaktlar" data-kaa="Baylanıslar">Contacts</button>
+      <button class="nav-btn active" data-tab="dashboard" data-en="Dashboard" data-ru="Панель" data-uz="Boshqaruv paneli" data-kaa="Basqarıw paneli">Dashboard</button>
+      <button class="nav-btn" data-tab="contacts" data-en="Contacts" data-ru="Контакты" data-uz="Kontaktlar" data-kaa="Baylanıslar">Contacts</button>
       <button class="nav-btn" data-tab="results" data-en="Results" data-ru="Результаты" data-uz="Natijalar" data-kaa="Nátiyjeler">Results</button>
       <button class="nav-btn" data-tab="feedback" data-en="Feedback" data-ru="Отзывы" data-uz="Fikrlar" data-kaa="Pikirler">Feedback</button>
       <button class="nav-btn" data-tab="templates" data-en="Templates" data-ru="Шаблоны" data-uz="Shablonlar" data-kaa="Úlgiler">Templates</button>
@@ -52,7 +53,135 @@
     </nav>
 
     <main class="admin-main">
-      <div id="contactsTab" class="tab-content active">
+      <div id="dashboardTab" class="tab-content active">
+        <section id="dashboard-section">
+          <div class="tab-header">
+            <h2 data-en="Dashboard" data-ru="Панель управления" data-uz="Boshqaruv paneli" data-kaa="Basqarıw paneli">Dashboard</h2>
+            <div class="tab-actions">
+              <span class="dash-period" data-en="Last 30 days" data-ru="За последние 30 дней" data-uz="So‘nggi 30 kun" data-kaa="Aqırǵı 30 kún">Last 30 days</span>
+            </div>
+          </div>
+
+          <!-- KPI карточки -->
+          <div class="dash-kpi-grid">
+            <div class="dash-kpi">
+              <div class="dash-kpi-top">
+                <span class="dash-kpi-icon icon-blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </span>
+                <span class="dash-trend up">▲ 12%</span>
+              </div>
+              <div class="dash-kpi-value" data-count="1248">1,248</div>
+              <div class="dash-kpi-label" data-en="Total Requests" data-ru="Всего заявок" data-uz="Jami so‘rovlar" data-kaa="Jámi sorawlar">Всего заявок</div>
+              <div class="dash-kpi-foot up" data-en="+12% this week" data-ru="+12% за неделю" data-uz="+12% bu hafta" data-kaa="+12% bul hápte">+12% за неделю</div>
+            </div>
+
+            <div class="dash-kpi">
+              <div class="dash-kpi-top">
+                <span class="dash-kpi-icon icon-violet">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </span>
+                <span class="dash-trend up">▲ 8%</span>
+              </div>
+              <div class="dash-kpi-value" data-count="342">342</div>
+              <div class="dash-kpi-label" data-en="Business Plans Sold" data-ru="Продано бизнес-планов" data-uz="Sotilgan biznes-rejalar" data-kaa="Satılǵan biznes-jobalar">Продано бизнес-планов</div>
+              <div class="dash-kpi-foot up" data-en="+8% this week" data-ru="+8% за неделю" data-uz="+8% bu hafta" data-kaa="+8% bul hápte">+8%</div>
+            </div>
+
+            <div class="dash-kpi">
+              <div class="dash-kpi-top">
+                <span class="dash-kpi-icon icon-cyan">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </span>
+                <span class="dash-trend flat">● Стабильно</span>
+              </div>
+              <div class="dash-kpi-value" data-count="4.2" data-decimals="1" data-suffix="%">4.2%</div>
+              <div class="dash-kpi-label" data-en="Site Conversion" data-ru="Конверсия сайта" data-uz="Sayt konversiyasi" data-kaa="Sayt konversiyası">Конверсия сайта</div>
+              <div class="dash-kpi-foot flat" data-en="Stable" data-ru="Стабильно" data-uz="Barqaror" data-kaa="Turaqlı">Стабильно</div>
+            </div>
+
+            <div class="dash-kpi">
+              <div class="dash-kpi-top">
+                <span class="dash-kpi-icon icon-green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </span>
+                <span class="dash-trend up">▲ 15%</span>
+              </div>
+              <div class="dash-kpi-value" data-count="45200" data-prefix="$">$45,200</div>
+              <div class="dash-kpi-label" data-en="Total Revenue" data-ru="Общая выручка" data-uz="Umumiy daromad" data-kaa="Ulıwma kiris">Общая выручка</div>
+              <div class="dash-kpi-foot up" data-en="+15% this week" data-ru="+15% за неделю" data-uz="+15% bu hafta" data-kaa="+15% bul hápte">+15%</div>
+            </div>
+          </div>
+
+          <!-- Аналитика: график + активность -->
+          <div class="dash-grid-2">
+            <div class="dash-card dash-chart-card">
+              <div class="dash-card-head">
+                <h3 data-en="Sales Dynamics" data-ru="Динамика продаж" data-uz="Sotuv dinamikasi" data-kaa="Satıw dinamikası">Динамика продаж</h3>
+                <span class="dash-legend">2026</span>
+              </div>
+              <div class="dash-bars">
+                <div class="dash-bar-col"><span class="dash-bar-val">186</span><div class="dash-bar" style="--h:45%"></div><span class="dash-bar-label" data-en="Jan" data-ru="Янв" data-uz="Yan" data-kaa="Yan">Янв</span></div>
+                <div class="dash-bar-col"><span class="dash-bar-val">224</span><div class="dash-bar" style="--h:54%"></div><span class="dash-bar-label" data-en="Feb" data-ru="Фев" data-uz="Fev" data-kaa="Fev">Фев</span></div>
+                <div class="dash-bar-col"><span class="dash-bar-val">198</span><div class="dash-bar" style="--h:48%"></div><span class="dash-bar-label" data-en="Mar" data-ru="Мар" data-uz="Mar" data-kaa="Mar">Мар</span></div>
+                <div class="dash-bar-col"><span class="dash-bar-val">312</span><div class="dash-bar" style="--h:75%"></div><span class="dash-bar-label" data-en="Apr" data-ru="Апр" data-uz="Apr" data-kaa="Apr">Апр</span></div>
+                <div class="dash-bar-col"><span class="dash-bar-val">358</span><div class="dash-bar" style="--h:86%"></div><span class="dash-bar-label" data-en="May" data-ru="Май" data-uz="May" data-kaa="May">Май</span></div>
+                <div class="dash-bar-col"><span class="dash-bar-val">412</span><div class="dash-bar tallest" style="--h:100%"></div><span class="dash-bar-label" data-en="Jun" data-ru="Июн" data-uz="Iyn" data-kaa="Iyn">Июн</span></div>
+              </div>
+            </div>
+
+            <div class="dash-card dash-activity-card">
+              <div class="dash-card-head">
+                <h3 data-en="Recent Activity" data-ru="Последняя активность" data-uz="So‘nggi faollik" data-kaa="Aqırǵı belsendilik">Последняя активность</h3>
+              </div>
+              <ul class="dash-activity">
+                <li class="dash-act">
+                  <span class="dash-act-dot success"></span>
+                  <div class="dash-act-body">
+                    <span class="dash-act-title" data-en="New request from Sanjar" data-ru="Новая заявка от Sanjar" data-uz="Sanjardan yangi so‘rov" data-kaa="Sanjardan jańa soraw">Новая заявка от Sanjar</span>
+                    <span class="dash-act-time" data-en="2 min ago" data-ru="2 мин назад" data-uz="2 daqiqa oldin" data-kaa="2 minut burın">2 мин назад</span>
+                  </div>
+                  <span class="dash-status success" data-en="Success" data-ru="Успешно" data-uz="Muvaffaqiyatli" data-kaa="Tabıslı">Успешно</span>
+                </li>
+                <li class="dash-act">
+                  <span class="dash-act-dot success"></span>
+                  <div class="dash-act-body">
+                    <span class="dash-act-title" data-en="Template “Cafe” updated" data-ru="Шаблон «Кафе» обновлён" data-uz="“Kafe” shabloni yangilandi" data-kaa="“Kafe” úlgisi jańalandı">Шаблон «Кафе» обновлён</span>
+                    <span class="dash-act-time" data-en="18 min ago" data-ru="18 мин назад" data-uz="18 daqiqa oldin" data-kaa="18 minut burın">18 мин назад</span>
+                  </div>
+                  <span class="dash-status success" data-en="Success" data-ru="Успешно" data-uz="Muvaffaqiyatli" data-kaa="Tabıslı">Успешно</span>
+                </li>
+                <li class="dash-act">
+                  <span class="dash-act-dot warning"></span>
+                  <div class="dash-act-body">
+                    <span class="dash-act-title" data-en="User left a review" data-ru="Пользователь оставил отзыв" data-uz="Foydalanuvchi sharh qoldirdi" data-kaa="Paydalanıwshı pikir qaldırdı">Пользователь оставил отзыв</span>
+                    <span class="dash-act-time" data-en="1 hour ago" data-ru="1 ч назад" data-uz="1 soat oldin" data-kaa="1 saat burın">1 ч назад</span>
+                  </div>
+                  <span class="dash-status processing" data-en="Processing" data-ru="В обработке" data-uz="Ko‘rib chiqilmoqda" data-kaa="Qaralıp atır">В обработке</span>
+                </li>
+                <li class="dash-act">
+                  <span class="dash-act-dot success"></span>
+                  <div class="dash-act-body">
+                    <span class="dash-act-title" data-en="Business plan “Car Wash” downloaded" data-ru="Скачан бизнес-план «Автомойка»" data-uz="“Avtomoyka” biznes-rejasi yuklandi" data-kaa="“Avtomoyka” biznes-jobası júklendi">Скачан бизнес-план «Автомойка»</span>
+                    <span class="dash-act-time" data-en="3 hours ago" data-ru="3 ч назад" data-uz="3 soat oldin" data-kaa="3 saat burın">3 ч назад</span>
+                  </div>
+                  <span class="dash-status success" data-en="Success" data-ru="Успешно" data-uz="Muvaffaqiyatli" data-kaa="Tabıslı">Успешно</span>
+                </li>
+                <li class="dash-act">
+                  <span class="dash-act-dot warning"></span>
+                  <div class="dash-act-body">
+                    <span class="dash-act-title" data-en="New request from Dilnoza" data-ru="Новая заявка от Dilnoza" data-uz="Dilnozadan yangi so‘rov" data-kaa="Dilnozadan jańa soraw">Новая заявка от Dilnoza</span>
+                    <span class="dash-act-time" data-en="Today" data-ru="Сегодня" data-uz="Bugun" data-kaa="Bügin">Сегодня</span>
+                  </div>
+                  <span class="dash-status processing" data-en="Processing" data-ru="В обработке" data-uz="Ko‘rib chiqilmoqda" data-kaa="Qaralıp atır">В обработке</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div id="contactsTab" class="tab-content">
         <div class="tab-header">
           <h2 data-en="Contact Messages" data-ru="Сообщения" data-uz="Xabarlar" data-kaa="Baylanıs Xabarları">Contact Messages</h2>
           <div class="tab-actions">

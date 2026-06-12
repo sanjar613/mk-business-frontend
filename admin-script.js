@@ -252,6 +252,46 @@ function showToast(message, type, title) {
 window.showToast = showToast;
 
 /* ============================================================
+   DASHBOARD (статические данные + анимация чисел)
+   ============================================================ */
+function animateCount(el) {
+  const target = parseFloat(el.getAttribute('data-count'));
+  if (isNaN(target)) return;
+  const decimals = parseInt(el.getAttribute('data-decimals') || '0', 10);
+  const prefix = el.getAttribute('data-prefix') || '';
+  const suffix = el.getAttribute('data-suffix') || '';
+  const withCommas = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const fmt = (v) => prefix + (decimals > 0 ? v.toFixed(decimals) : withCommas(Math.round(v))) + suffix;
+
+  // Уважаем системную настройку «уменьшить движение»
+  try {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = fmt(target);
+      return;
+    }
+  } catch (e) { /* no-op */ }
+
+  if (typeof requestAnimationFrame !== 'function') { el.textContent = fmt(target); return; }
+
+  const now = () => ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now());
+  const dur = 900;
+  const start = now();
+  function frame() {
+    const p = Math.min(1, (now() - start) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = fmt(target * eased);
+    if (p < 1) requestAnimationFrame(frame);
+    else el.textContent = fmt(target);
+  }
+  requestAnimationFrame(frame);
+}
+
+function loadDashboard() {
+  document.querySelectorAll('#dashboard-section .dash-kpi-value[data-count]').forEach(animateCount);
+}
+window.loadDashboard = loadDashboard;
+
+/* ============================================================
    ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
    ============================================================ */
 function switchTab(tabId) {
@@ -259,12 +299,13 @@ function switchTab(tabId) {
     btn.classList.toggle('active', btn.dataset.tab === tabId);
   });
   document.querySelectorAll('.tab-content').forEach((content) => {
-    const match = content.id === tabId + 'Tab' || content.id === tabId;
+    const match = content.id === tabId + 'Tab' || content.id === tabId || content.id === tabId + '-section';
     content.style.display = match ? 'block' : 'none';
     content.classList.toggle('active', match);
   });
 
-  if (tabId === 'contacts') loadContacts();
+  if (tabId === 'dashboard') loadDashboard();
+  else if (tabId === 'contacts') loadContacts();
   else if (tabId === 'results') loadResults();
   else if (tabId === 'feedback') loadFeedbacks();
   else if (tabId === 'templates') loadTemplates();
